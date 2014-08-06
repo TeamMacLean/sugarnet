@@ -1,0 +1,20 @@
+{
+  "name": "rotool",
+  "version": "0.0.0",
+  "homepage": "https://github.com/wookoouk/rotool",
+  "authors": [
+    "Martin Page <martin.page@tsl.ac.uk>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0"
+  }
+}
