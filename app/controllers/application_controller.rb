@@ -155,8 +155,6 @@ jpeg(img7)
           edge.color = "green")
 dev.off()
 
-
-
          library("HiveR")
 
          mock_hive <- make_annotated_hive(mock_igr)
