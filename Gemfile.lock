@@ -30,6 +30,7 @@ GEM
     arel (5.0.1.20140414130214)
     builder (3.2.2)
     erubis (2.7.0)
+    headless (1.0.2)
     hike (1.2.3)
     i18n (0.6.9)
     json (1.8.1)
@@ -82,5 +83,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  headless (= 1.0.2)
   rails (= 4.1.4)
   rinruby (= 2.0.3)

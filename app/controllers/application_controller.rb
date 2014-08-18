@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
     # @img12 = graphpath+@mill+'12.jpg'
     # @img13 = graphpath+@mill+'13.jpg'
 
-
+    headless = Headless.new
     myr = RinRuby.new
     myr.img1 = @img1
     myr.img2 = @img2
@@ -129,10 +129,6 @@ jpeg(img4)
     flg22_edges <-make_net(flg22_long, y)
 dev.off()
 
-
-
-
-
      mock_igr <-network.make.igraph(mock_edges, mock_nodelabels)
      avr_igr <-network.make.igraph(avr_edges, avr_nodelabels)
      vir_igr <-network.make.igraph(vir_edges, vir_nodelabels)
@@ -220,6 +216,7 @@ dev.off()
 
 EOF
     myr.quit
+    headless.destroy
     # render :text => 'done'
     render
   end
