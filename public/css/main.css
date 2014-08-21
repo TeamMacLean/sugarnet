@@ -1,0 +1,88 @@
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,700);
+
+body {
+    font-family: 'Raleway', sans-serif;
+    color: #333;
+}
+
+#logo {
+    background-color: darksalmon;
+    margin-bottom: 20px;
+    padding: 20px
+}
+
+#logo a {
+    text-decoration: none;
+    color: inherit;
+}
+
+#logo h1 {
+    font-size: 5em;
+    font-weight: 700;
+    margin: 0;
+}
+
+#logo h3 {
+    font-size: 0.8em;
+    text-align: center;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+}
+
+#checkController {
+
+}
+
+#checkController .btn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#results img {
+    margin-bottom: 100px;
+}
+
+#treatmentList h3 {
+    text-align: center;
+    margin-right: 20px;
+    float:left;
+}
+
+#treatmentList a {
+    color: #e74c3c;
+    text-decoration: none;
+}
+
+#treatmentList a:hover {
+    color: #c0392b;
+}
+
+.non-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.non-btn .close {
+    margin-left: 8px;
+}
