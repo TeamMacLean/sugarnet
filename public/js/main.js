@@ -17,11 +17,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.sessionID = null;
     $scope.headers = [];
     $scope.treatments = [];
-
     $scope.otherOptions = ['gene ID', 'unused'];
-
     $scope.defineOptions = [];
-
 
     $scope.reloadDefineOptions = function () {
         $scope.defineOptions = $scope.otherOptions.concat($scope.treatments);
@@ -35,6 +32,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.addTreatment = function (header) {
         if (!_.contains($scope.treatments, header) && !_.isEmpty(header)) {
+            $scope.header = '';
             _.pull($scope.headers, header);
             $scope.treatments.push(header);
 
@@ -45,7 +43,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.removeTreatment = function (treatment) {
         if (_.contains($scope.treatments, treatment)) {
             _.pull($scope.treatments, treatment);
-            $scope.headers.push(treatment);
 
             $scope.reloadDefineOptions();
         }
@@ -62,10 +59,20 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         })
             .success(function (d) {
                 console.log(d);
-                $scope.headers = d;
+                //$scope.headers = d;
+
+                _.forEach(d, function (item) {
+                    var head = {name: item, treatment: undefined};
+                    $scope.headers.push(head);
+                });
+
                 $scope.reloadDefineOptions();
             });
     };
 
-}])
-;
+    $scope.getResults = function () {
+        console.log($scope.headers);
+    }
+
+}]);
+

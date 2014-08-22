@@ -1,6 +1,6 @@
 <div ng-app="rotool" ng-controller="checkController" id="checkController">
 
-    <div class="stepOne">
+    <div id="stepOne">
 
         <div class="container">
 
@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <div class="stepTwo">
+    <div id="stepTwo">
         <div class="container">
             <h1>Treatments</h1>
 
@@ -21,8 +21,8 @@
                 <button class="btn btn-default center-block">add treatment</button>
             </form>
 
-            <div ng-repeat="treatment in treatments" id="treatmentList">
-                <div class="non-btn">
+            <div ng-repeat="treatment in treatments">
+                <div class="non-btn float-left">
                     <button type="button" ng-click="removeTreatment(treatment)" class="close">
                         <span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
                     {{treatment}}
@@ -31,17 +31,16 @@
         </div>
     </div>
 
-    <div class="stepThree">
+    <div id="stepThree">
         <div class="container">
 
             <h1>Explain the data</h1>
 
             <div ng-repeat="header in headers" id="headerList">
-                <p>{{header}} <select ng-model="define" ng-options="d as d for d in defineOptions"></select></p>
-
+                <p>{{header.name}} <select ng-model="header.treatment" ng-options="d as d for d in defineOptions" ></select></p>
             </div>
 
-            <button class="btn btn-default center-block">Submit</button>
+            <button class="btn btn-default center-block" ng-click="getResults()">Submit</button>
 
         </div>
     </div>

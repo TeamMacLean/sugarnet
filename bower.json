@@ -17,7 +17,6 @@
   "dependencies": {
     "bootstrap": "~3.2.0",
     "angular": "~1.2.22",
-    "lodash": "~2.4.1",
-    "ng-file-upload": "~1.6.5"
+    "lodash": "~2.4.1"
   }
 }
