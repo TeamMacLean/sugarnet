@@ -17,7 +17,7 @@
             <h1>Treatments</h1>
 
             <form ng-submit="addTreatment(header)">
-                <input type="text" ng-model="header" class="center-block">
+                <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name">
                 <button class="btn btn-default center-block">add treatment</button>
             </form>
 
@@ -37,12 +37,20 @@
             <h1>Explain the data</h1>
 
             <div ng-repeat="header in headers" id="headerList">
-                <p>{{header.name}} <select ng-model="header.treatment" ng-options="d as d for d in defineOptions" ></select></p>
+                <p>{{header.name}}
+                    <select ng-model="header.treatment" ng-options="d as d for d in defineOptions" ng-change="checkCompletion()"></select></p>
             </div>
 
-            <button class="btn btn-default center-block" ng-click="getResults()">Submit</button>
+            <button class="btn btn-default center-block disabled" ng-click="getResults()">Submit</button>
 
+            <button class="btn btn-danger center-block" ng-click="fillOptions()">Dev Cheat</button>
         </div>
     </div>
+
+    <div id="footer">
+    <h3>Developed by <a href="http://twitter.com/biodevops">Martin Page</a> of <a href="danmaclean.info">Team Maclean.</a></h3>
+    </div>
+
+
 
 </div>

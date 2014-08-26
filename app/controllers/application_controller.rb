@@ -18,16 +18,17 @@ class ApplicationController < ActionController::Base
   end
 
 
-  def result
+  def getResults
 
-    filepath = session[:file]
+    file = params[:file]
+    headersPreParse = params[:headers]
+    headersParsed = JSON[headersPreParse]
 
-    if !File.exist?(filepath)
+    if !File.exist?(file)
       return render :text => 'the file or file path did not persist between pages'
     end
 
     # "gene_nets/fpkm_data.csv"
-    puts filepath
     require 'rinruby'
 
     graphpath = 'public/graphs/'
