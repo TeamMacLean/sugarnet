@@ -33,9 +33,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.addTreatment = function (header) {
         if (!_.contains($scope.treatments, header) && !_.isEmpty(header)) {
             $scope.header = '';
-            _.pull($scope.headers, header);
-            $scope.treatments.push(header);
 
+            $scope.treatments.push(header);
             $scope.reloadDefineOptions();
         }
     };
@@ -64,10 +63,14 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     $scope.headers.push(head);
                 });
                 $scope.reloadDefineOptions();
+                $('#dataExplainHelp').show();
             });
     };
 
     $scope.checkCompletion = function () {
+
+        console.log()
+
         if (!_.isEmpty($scope.headers)) {
             var withoutTreatment = false;
             _.forEach($scope.headers, function (header) {
@@ -89,23 +92,34 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.getResults = function () {
 
         var fd = new FormData();
+
+        // add file to form data
         angular.forEach($scope.files, function (file) {
             fd.append('file', file)
         });
+
+        // add header list to form data
         fd.append('headers', angular.toJson($scope.headers));
 
+
+        // post it
         $http.post('getResults', fd, {
-                transformRequest: angular.identity,
-                headers: {'Content-Type': undefined}
-            })
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        })
             .success(function (d) {
+
+//                SHOULD GET A BUNCH OF URLS FOR IMAGES IN RETURN
+
+                console.log('POSTED');
                 console.log(d);
             });
     };
 
+
     $scope.fillOptions = function () {
         _.forEach($scope.headers, function (head) {
-            head.treatment = $scope.defineOptions[0];
+            head.treatment = $scope.defineOptions[1];
         });
         $scope.checkCompletion();
     }

@@ -4,9 +4,9 @@
 
         <div class="container">
 
-            <h1>Upload your CSV file</h1>
+            <h1>1. Upload your CSV file</h1>
 
-            <input type="file" file-input="files" class="center-block">
+            <input type="file" file-input="files" class="center-block form-control auto-width">
             <button ng-click="upload()" class="btn btn-default center-block">Upload</button>
 
         </div>
@@ -14,10 +14,10 @@
 
     <div id="stepTwo">
         <div class="container">
-            <h1>Treatments</h1>
+            <h1>2. Treatments</h1>
 
             <form ng-submit="addTreatment(header)">
-                <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name">
+                <input type="text" ng-model="header" class="center-block form-control auto-width" placeholder="treatment name">
                 <button class="btn btn-default center-block">add treatment</button>
             </form>
 
@@ -33,24 +33,58 @@
 
     <div id="stepThree">
         <div class="container">
+            <h1>3. Explain the data</h1>
 
-            <h1>Explain the data</h1>
-
-            <div ng-repeat="header in headers" id="headerList">
-                <p>{{header.name}}
-                    <select ng-model="header.treatment" ng-options="d as d for d in defineOptions" ng-change="checkCompletion()"></select></p>
+            <div class="row" id="dataExplainHelp">
+                <div class="col-xs-3">
+                    <h3>Column name</h3>
+                </div>
+                <div class="col-xs-3">
+                    <h3>Treatments</h3>
+                </div>
+                <div class="col-xs-6">
+                    <div class="col-xs-4">
+                        <h3>Days</h3>
+                    </div>
+                    <div class="col-xs-4">
+                        <h3>Hours</h3>
+                    </div>
+                    <div class="col-xs-4">
+                        <h3>Minutes</h3>
+                    </div>
+                </div>
             </div>
 
+            <div ng-repeat="header in headers" id="headerList">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <h4>{{header.name}}</h4>
+                    </div>
+                    <div class="col-xs-3">
+                        <select class="center-block form-control" ng-model="header.treatment" ng-options="d as d for d in defineOptions" ng-change="checkCompletion()"></select>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="col-xs-4">
+                            <input class="center-block form-control" ng-model="header.time.days" type="number">
+                        </div>
+                        <div class="col-xs-4">
+                            <input class="center-block form-control" ng-model="header.time.hours" type="number">
+                        </div>
+                        <div class="col-xs-4">
+                            <input class="center-block form-control" ng-model="header.time.minutes" type="number">
+                        </div>
+                    </div>
+                </div>
+            </div>
             <button class="btn btn-default center-block disabled" ng-click="getResults()">Submit</button>
-
             <button class="btn btn-danger center-block" ng-click="fillOptions()">Dev Cheat</button>
         </div>
     </div>
 
     <div id="footer">
-    <h3>Developed by <a href="http://twitter.com/biodevops">Martin Page</a> of <a href="danmaclean.info">Team Maclean.</a></h3>
+        <h3>Developed by <a href="http://twitter.com/biodevops">Martin Page</a> of
+            <a href="danmaclean.info">Team Maclean.</a></h3>
     </div>
-
 
 
 </div>

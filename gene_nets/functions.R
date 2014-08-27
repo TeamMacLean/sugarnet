@@ -53,7 +53,7 @@ make_longitudinal <- function(df){
   df$mean_6h <-NULL
   df$mean_12h <-NULL
   m <- t(as.matrix(df))
-  return(as.longitudinal(m, repeats=c(2,2,2), time=c(1,6,12) ))
+  return(as.longitudinal(m, repeats=c(2,2,2), time=c(1,16,2) ))
   
 }
 
@@ -116,6 +116,7 @@ make_annotated_hive <- function(igraph){
   dataSet.ext <- ddply(dataSet, .variables=c("V1", "V2", "V3"), function(x) data.frame(F1(x)))
   
   for (i in 1:nrow(dataSet.ext))
+
   {
     E(gD)[as.character(dataSet.ext$V1) %--% as.character(dataSet.ext$V2)]$weight <- as.numeric(dataSet.ext$V3)
     E(gD)[as.character(dataSet.ext$V1) %--% as.character(dataSet.ext$V2)]$similarity <- as.numeric(dataSet.ext$V4)

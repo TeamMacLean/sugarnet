@@ -1,51 +1,72 @@
 class ApplicationController < ActionController::Base
 
+  # POST: "file"
+
   def uploadCSV
+    #   get file handle from post
     fileinput = params[:file]
 
+    #   check file is available/valid
     if !fileinput || !fileinput.tempfile || !fileinput.tempfile.path
       return render :text => 'failed to receive file'
     end
 
     headerline = ''
+    #   get first line of file
     File.open(fileinput.tempfile.path) { |f| headerline = f.readline }
+    #   split line into headers
     @headers = headerline.split(',')
+    #   return headers as JSON
     render :json => @headers
   end
+
+  # GET: render main page
 
   def index
     render
   end
 
-
+  # POST: "file", "headers"
   def getResults
 
+    #   get file from post
     file = params[:file]
+    #   get headers from post
     headersPreParse = params[:headers]
+    #   convert headers to json array
     headersParsed = JSON[headersPreParse]
 
-    if !File.exist?(file)
-      return render :text => 'the file or file path did not persist between pages'
+    #   check file is available/valid
+    if !file || !file.tempfile || !file.tempfile.path
+      return render :text => 'failed to receive file'
     end
 
-    # "gene_nets/fpkm_data.csv"
-    require 'rinruby'
+    #   list headers //DEBUG
+    # headersParsed.each do |header|
+    #   puts header["name"]
+    #   puts header["treatment"]
+    # end
 
+    #   return nothing //DEBUG
+    # return render :text => 'cool'
+
+    require 'rinruby'
     graphpath = 'public/graphs/'
 
+    #   use timestamp as unique file name prefix
     @mill = DateTime.now.strftime('%Q')
 
-    @img1 = graphpath+@mill+'1.jpg'
-    @img2 = graphpath+@mill+'2.jpg'
-    @img3 = graphpath+@mill+'3.jpg'
-    @img4 = graphpath+@mill+'4.jpg'
-    @img5 = graphpath+@mill+'5.jpg'
-    @img6 = graphpath+@mill+'6.jpg'
-    @img7 = graphpath+@mill+'7.jpg'
-    @img8 = graphpath+@mill+'8.jpg'
-    @img9 = graphpath+@mill+'9.jpg'
-    @img10 = graphpath+@mill+'10.jpg'
-    @img11 = graphpath+@mill+'11.jpg'
+    # @img1 = graphpath+@mill+'1.jpg'
+    # @img2 = graphpath+@mill+'2.jpg'
+    # @img3 = graphpath+@mill+'3.jpg'
+    # @img4 = graphpath+@mill+'4.jpg'
+    # @img5 = graphpath+@mill+'5.jpg'
+    # @img6 = graphpath+@mill+'6.jpg'
+    # @img7 = graphpath+@mill+'7.jpg'
+    # @img8 = graphpath+@mill+'8.jpg'
+    # @img9 = graphpath+@mill+'9.jpg'
+    # @img10 = graphpath+@mill+'10.jpg'
+    # @img11 = graphpath+@mill+'11.jpg'
 
     headless = Headless.new
     myr = RinRuby.new
@@ -61,18 +82,22 @@ class ApplicationController < ActionController::Base
     myr.img10 = @img10
     myr.img11 = @img11
 
-    myr.filepath = filepath
+    myr.file = file
+
+
+    # //TODO create array per treatment of headers
+    headersParsed.each do |header|
+
+
+
+    end
 
 
     myr.eval <<EOF
     source('gene_nets/functions.R')
     load_libraries()
 
-    # these data are FPKM from DOI: 10.1371/journal.pone.0074183
-    #raw_filename = "gene_nets/fpkm_data.csv"
-    # -----INPUT??????-----
-    # raw_filename = "gene_nets/fpkm_data.csv"
-    raw_filename = filepath
+    raw_filename = file
     data <-read.csv(raw_filename, header = TRUE)
 
 
@@ -132,84 +157,84 @@ class ApplicationController < ActionController::Base
     # flg22_edges <-make_net(flg22_long, y)
     # dev.off()
 
-     mock_igr <-network.make.igraph(mock_edges, mock_nodelabels)
-     avr_igr <-network.make.igraph(avr_edges, avr_nodelabels)
-     vir_igr <-network.make.igraph(vir_edges, vir_nodelabels)
-     flg22_igr <-network.make.igraph(flg22_edges, flg22_nodelabels)
-     union <-graph.union(mock_igr, avr_igr, vir_igr, flg22_igr)
+     # mock_igr <-network.make.igraph(mock_edges, mock_nodelabels)
+     # avr_igr <-network.make.igraph(avr_edges, avr_nodelabels)
+     # vir_igr <-network.make.igraph(vir_edges, vir_nodelabels)
+     # flg22_igr <-network.make.igraph(flg22_edges, flg22_nodelabels)
+     # union <-graph.union(mock_igr, avr_igr, vir_igr, flg22_igr)
 
 
-    jpeg(img5)
-    plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-    dev.off()
+    # jpeg(img5)
+    # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+    # dev.off()
 
-    jpeg(img6)
-    plot(avr_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
-    dev.off()
+    # jpeg(img6)
+    # plot(avr_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
+    # dev.off()
 
     # jpeg(img7)
     # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
     # dev.off()
 
-    library("HiveR")
+    # library("HiveR")
 
-    mock_hive <- make_annotated_hive(mock_igr)
-
-
-    avr_hive <- make_annotated_hive(avr_igr)
+    # mock_hive <- make_annotated_hive(mock_igr)
 
 
-    vir_hive <- make_annotated_hive(vir_igr)
+    # avr_hive <- make_annotated_hive(avr_igr)
 
 
-    flg22_hive <- make_annotated_hive(flg22_igr)
+    # vir_hive <- make_annotated_hive(vir_igr)
 
-    library(plyr)
-    jpeg(img8)
+
+    # flg22_hive <- make_annotated_hive(flg22_igr)
+
+    # library(plyr)
+    # jpeg(img8)
     # Change the node color and size based on node degree and betweenness values
-    plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-    dev.off()
+    # plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+    # dev.off()
 
-    jpeg(img9)
-    plotHive(avr_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-    dev.off()
+    # jpeg(img9)
+    # plotHive(avr_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+    # dev.off()
 
-    jpeg(img10)
-    plotHive(vir_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-    dev.off()
+    # jpeg(img10)
+    # plotHive(vir_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+    # dev.off()
 
     # jpeg(img11)
     # plotHive(flg22_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
     # dev.off()
 
-    library(venneuler)
-    library(stringr)
-    mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
-    avr_genes <- str_sub(V(avr_igr)$name, 1, 9)
-    vir_genes <- str_sub(V(vir_igr)$name, 1, 9)
-    flg22_genes <- V(flg22_igr)$name
-    euler <- make_fourway_euler_diagram(mock_genes, avr_genes, vir_genes, flg22_genes)
+    # library(venneuler)
+    # library(stringr)
+    # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
+    # avr_genes <- str_sub(V(avr_igr)$name, 1, 9)
+    # vir_genes <- str_sub(V(vir_igr)$name, 1, 9)
+    # flg22_genes <- V(flg22_igr)$name
+    # euler <- make_fourway_euler_diagram(mock_genes, avr_genes, vir_genes, flg22_genes)
 
     #jpeg(img12)
-    plot(euler)
+    # plot(euler)
     #dev.off()
 
 
-    rand_mock <- sample(mock_nodelabels, length(mock_genes))
-    rand_avr <- sample(avr_nodelabels, length(avr_genes))
-    rand_vir <- sample(vir_nodelabels, length(vir_genes))
-    rand_flg22 <- sample(flg22_nodelabels, length(flg22_genes))
-    rand_euler <- make_fourway_euler_diagram(rand_mock, rand_avr, rand_vir, rand_flg22)
+    # rand_mock <- sample(mock_nodelabels, length(mock_genes))
+    # rand_avr <- sample(avr_nodelabels, length(avr_genes))
+    # rand_vir <- sample(vir_nodelabels, length(vir_genes))
+    # rand_flg22 <- sample(flg22_nodelabels, length(flg22_genes))
+    # rand_euler <- make_fourway_euler_diagram(rand_mock, rand_avr, rand_vir, rand_flg22)
 
     #jpeg(img13)
-    plot(rand_euler)
+    # plot(rand_euler)
     #dev.off()
 
 
-    write.table(get.edgelist(mock_igr), "public/graphs/mock_edges.txt", col.names = FALSE, row.names = FALSE)
-    write.table(get.edgelist(avr_igr), "public/graphs/avr_edges.txt", col.names = FALSE, row.names = FALSE)
-    write.table(get.edgelist(vir_igr), "public/graphs/vir_edges.txt", col.names = FALSE, row.names = FALSE)
-    write.table(get.edgelist(flg22_igr), "public/graphs/flg22_edges.txt", col.names = FALSE, row.names = FALSE)
+    # write.table(get.edgelist(mock_igr), "public/graphs/mock_edges.txt", col.names = FALSE, row.names = FALSE)
+    # write.table(get.edgelist(avr_igr), "public/graphs/avr_edges.txt", col.names = FALSE, row.names = FALSE)
+    # write.table(get.edgelist(vir_igr), "public/graphs/vir_edges.txt", col.names = FALSE, row.names = FALSE)
+    # write.table(get.edgelist(flg22_igr), "public/graphs/flg22_edges.txt", col.names = FALSE, row.names = FALSE)
 
 EOF
     myr.quit
