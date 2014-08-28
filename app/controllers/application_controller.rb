@@ -29,16 +29,24 @@ class ApplicationController < ActionController::Base
   # POST: "file", "headers"
   def getResults
 
-    #   get file from post
     file = params[:file]
-    #   get headers from post
-    headersPreParse = params[:headers]
-    #   convert headers to json array
-    headersParsed = JSON[headersPreParse]
+    headersParsed = JSON[params[:headers]]
+    treatments = JSON[params[:options]]
+
 
     #   check file is available/valid
     if !file || !file.tempfile || !file.tempfile.path
       return render :text => 'failed to receive file'
+    end
+    puts treatments
+    puts headersParsed
+
+    treatments.each do |option|
+
+      # filter here
+      headersParsed.each do |header|
+        p header.select { |h| h["treatment"] == option && 1 > 100 }
+      end
     end
 
     #   list headers //DEBUG
@@ -68,30 +76,24 @@ class ApplicationController < ActionController::Base
     # @img10 = graphpath+@mill+'10.jpg'
     # @img11 = graphpath+@mill+'11.jpg'
 
-    headless = Headless.new
+    # headless = Headless.new
     myr = RinRuby.new
-    myr.img1 = @img1
-    myr.img2 = @img2
-    myr.img3 = @img3
-    myr.img4 = @img4
-    myr.img5 = @img5
-    myr.img6 = @img6
-    myr.img7 = @img7
-    myr.img8 = @img8
-    myr.img9 = @img9
-    myr.img10 = @img10
-    myr.img11 = @img11
+    # myr.img1 = @img1
+    # myr.img2 = @img2
+    # myr.img3 = @img3
+    # myr.img4 = @img4
+    # myr.img5 = @img5
+    # myr.img6 = @img6
+    # myr.img7 = @img7
+    # myr.img8 = @img8
+    # myr.img9 = @img9
+    # myr.img10 = @img10
+    # myr.img11 = @img11
 
-    myr.file = file
-
-
-    # //TODO create array per treatment of headers
-    headersParsed.each do |header|
+    myr.file = file.tempfile.path
 
 
-
-    end
-
+    return render :text => ''
 
     myr.eval <<EOF
     source('gene_nets/functions.R')

@@ -1,5 +1,6 @@
 var app = angular.module('rotool', []);
 
+// Just pretend this is not here, ok?
 app.directive('fileInput', ['$parse', function ($parse) {
     return {
         restrict: 'A',
@@ -17,7 +18,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.sessionID = null;
     $scope.headers = [];
     $scope.treatments = [];
-    $scope.otherOptions = ['gene ID', 'unused'];
+    $scope.otherOptions = ['ID', 'unused'];
     $scope.defineOptions = [];
 
     $scope.reloadDefineOptions = function () {
@@ -69,8 +70,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.checkCompletion = function () {
 
-        console.log()
-
         if (!_.isEmpty($scope.headers)) {
             var withoutTreatment = false;
             _.forEach($scope.headers, function (header) {
@@ -98,8 +97,18 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             fd.append('file', file)
         });
 
+
+//        //make data easy for backend
+//        var sortedByTreatments = [];
+//        _.forEach($scope.defineOptions, function (treatment) {
+//            var filtered = _.filter($scope.headers, {'treatment': treatment});
+//            sortedByTreatments.push(filtered);
+//        });
+
         // add header list to form data
         fd.append('headers', angular.toJson($scope.headers));
+
+        fd.append('options', angular.toJson($scope.defineOptions));
 
 
         // post it
