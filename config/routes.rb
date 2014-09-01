@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   # You can have the root of your site routed with "root"
   root 'application#index'
-  post '/uploadCSV' => 'application#uploadCSV'
-  post '/getResults' => 'application#getResults'
+  post '/uploadCSV' => 'application#upload_csv'
+  post '/getResults' => 'application#get_results'
 
 end

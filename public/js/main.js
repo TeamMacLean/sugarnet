@@ -90,39 +90,48 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.getResults = function () {
 
-        var fd = new FormData();
+        var postIt = function (headers) {
+            var fd = new FormData();
 
-        // add file to form data
-        angular.forEach($scope.files, function (file) {
-            fd.append('file', file)
-        });
-
-
-//        //make data easy for backend
-//        var sortedByTreatments = [];
-//        _.forEach($scope.defineOptions, function (treatment) {
-//            var filtered = _.filter($scope.headers, {'treatment': treatment});
-//            sortedByTreatments.push(filtered);
-//        });
-
-        // add header list to form data
-        fd.append('headers', angular.toJson($scope.headers));
-
-        fd.append('options', angular.toJson($scope.defineOptions));
-
-
-        // post it
-        $http.post('getResults', fd, {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        })
-            .success(function (d) {
-
-//                SHOULD GET A BUNCH OF URLS FOR IMAGES IN RETURN
-
-                console.log('POSTED');
-                console.log(d);
+            // add file to form data
+            angular.forEach($scope.files, function (file) {
+                fd.append('file', file)
             });
+
+            // add header list to form data
+            fd.append('headers', angular.toJson(headers));
+
+            fd.append('options', angular.toJson($scope.defineOptions));
+
+            // post it
+            $http.post('getResults', fd, {
+                transformRequest: angular.identity,
+                headers: {'Content-Type': undefined}
+            })
+                .success(function (d) {
+//                TODO SHOULD GET A BUNCH OF URLS FOR IMAGES IN RETURN
+                    console.log('POSTED');
+                    console.log(d);
+                });
+        };
+
+        var filteredHeaders = [];
+        var haveGeneID = false;
+        _.forEach($scope.headers, function (header) {
+            if (header.treatment == $scope.otherOptions[0]) {
+                if (haveGeneID) {
+//                    TODO error out, do not send
+                } else {
+                    haveGeneID = true;
+                }
+            }
+//            skip 'unused'
+            if (header.treatment != $scope.otherOptions[1]) {
+                filteredHeaders.push(header);
+            }
+        });
+        console.log(filteredHeaders);
+        postIt(filteredHeaders);
     };
 
 
