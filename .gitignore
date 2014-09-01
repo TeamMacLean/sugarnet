@@ -18,6 +18,6 @@ config/initializers/secret_token.rb
 
 .rvmrc
 
-
+*.iml
 .idea
 public/components
