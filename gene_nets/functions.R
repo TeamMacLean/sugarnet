@@ -1,3 +1,4 @@
+
 load_libraries_but_be_quiet <- function(){
   
   suppressWarnings(suppressPackageStartupMessages(load_libraries()))
@@ -16,44 +17,90 @@ load_libraries <- function(){
   a <- lapply(list.of.packages, require, character.only=T)  
 }
 
-get_diff_expressed <- function(df,x, name){
-  
-  cols <- get_cols(name)
-  df$mean_1h <- rowMeans(subset(df, select = cols[[1]]), na.rm = TRUE)
-  df$mean_6h <- rowMeans(subset(df, select = cols[[2]]), na.rm = TRUE)
-  df$mean_12h <- rowMeans(subset(df, select = cols[[3]]), na.rm = TRUE)
-  df$keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x) 
-  df <- df[df$keep,]
-  df$keep <- NULL
-  df <- na.omit(df)
-  return(df)
-}
-
+#get_diff_expressed <- function(df,x, name){
+#
+#
+#  uniqueTime <- unique(df$time)
+#
+#    for(ut in uniqueTime){
+#        expressions <- subset(df, time == uniqueTime)
+#    }
+#
+#
+#  cols <- get_cols(name)
+#
+#  df$mean_1h <- rowMeans(subset(df, select = cols[[1]]), na.rm = TRUE)
+#  df$mean_6h <- rowMeans(subset(df, select = cols[[2]]), na.rm = TRUE)
+#  df$mean_12h <- rowMeans(subset(df, select = cols[[3]]), na.rm = TRUE)
+#
+#  df$keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
+#
+#  df <- df[df$keep,]
+#  df$keep <- NULL
+#  df <- na.omit(df)
+#  return(df)
+#}
+#
 get_nodelabels <- function(df){
-  return(df$tracking_id) 
+  return(df$tracking_id)
 }
 
 
-get_cols <- function(name){
-  if (name == "MOCK"){
-    return(list(c("MOCK_1_1", "MOCK_1_2"),c("MOCK_6_1", "MOCK_6_2"),c("MOCK_12_1", "MOCK_12_2")))
-  }
-  if (name == "AVR"){
-    return(list(c("AVR_1_1", "AVR_1_2"),c("AVR_6_1", "AVR_6_2"),c("AVR_12_1", "AVR_12_2")))
-  }
-  if (name == "VIR"){
-    return(list(c("VIR_1_1", "VIR_1_2"),c("VIR_6_1", "VIR_6_2"),c("VIR_12_1", "VIR_12_2")))
-  }
+#get_cols <- function(name){
+#  if (name == "MOCK"){
+#    return(list(c("MOCK_1_1", "MOCK_1_2"),c("MOCK_6_1", "MOCK_6_2"),c("MOCK_12_1", "MOCK_12_2")))
+#  }
+#  if (name == "AVR"){
+#    return(list(c("AVR_1_1", "AVR_1_2"),c("AVR_6_1", "AVR_6_2"),c("AVR_12_1", "AVR_12_2")))
+#  }
+#  if (name == "VIR"){
+#    return(list(c("VIR_1_1", "VIR_1_2"),c("VIR_6_1", "VIR_6_2"),c("VIR_12_1", "VIR_12_2")))
+#  }
+#}
+
+make_it_like_dans <- function(expressions, getID = TRUE){
+      uniqueExperiments <- unique(expressions$experiment)
+      idGetter <- subset(expressions , experiment == uniqueExperiments[1])
+
+      id <- idGetter["gene"]
+
+      if(getID){
+        mock <- data.frame(id)
+      } else {
+        mock <- data.frame()
+      }
+      for(u in uniqueExperiments){
+        ttt = subset(expressions , experiment == u)
+          ue <- ttt["expression"]
+          mock[u] <- ue
+      }
+      return(mock)
 }
 
 make_longitudinal <- function(df){
-  df$tracking_id <- NULL
-  rownames(df) <- NULL
-  df$mean_1h <-NULL
-  df$mean_6h <-NULL
-  df$mean_12h <-NULL
-  m <- t(as.matrix(df))
-  return(as.longitudinal(m, repeats=c(2,2,2), time=c(1,16,2) ))
+
+times <- unique(df$time)
+#amount of repeats * times
+reps_pre <- max(unique(df$rep))
+reps <- c()
+for(t in times){
+reps <- append(reps, reps_pre)
+}
+
+print(times)
+print(reps)
+
+dd <- make_it_like_dans(df, FALSE)
+
+#  df$tracking_id <- NULL
+#  rownames(df) <- NULL
+#  df$mean_1h <-NULL
+#  df$mean_6h <-NULL
+#  df$mean_12h <-NULL
+
+  m <- t(as.matrix(dd))
+
+  return(as.longitudinal(m, repeats=reps, time=times))
   
 }
 
