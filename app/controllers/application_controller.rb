@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   # Beware, The following code sucks ass, trying to make sense of it is not a good idea.
   # All code was hacked together with no understanding on how to use R
 
+  R_ECHO = true
+
   def upload_csv
     file_input = params[:file]
 
@@ -44,7 +46,7 @@ class ApplicationController < ActionController::Base
     require 'rinruby'
     require 'csv'
 
-    myr = RinRuby.new(:echo => true)
+    myr = RinRuby.new(:echo => R_ECHO)
 
     # ---------- setup
 
@@ -58,65 +60,85 @@ class ApplicationController < ActionController::Base
     end
 
 
-    timpstamp = DateTime.now.strftime('%Q')
+    timestamp = DateTime.now.strftime('%Q')
 
-    puts "writing to tmp-#{timpstamp}.csv"
+    puts "writing to tmp-#{timestamp}.csv"
 
-    CSV.open("public/tmp/tmp-#{timpstamp}.csv", 'wb') do |csv|
-      csv << %w(expression experiment gene treatment time rep)
+    # CSV.open("public/tmp/tmp-#{timpstamp}.csv", 'wb') do |csv|
+    #   csv << %w(expression experiment gene treatment time rep)
+    #
+    #   treatments.each do |option|
+    #
+    #     id = headers_parsed.select { |h| h['treatment'] == 'ID' }[0]
+    #
+    #     gene_col = headers_parsed.index(id)
+    #
+    #     # filter out unused and ID
+    #     filter_output = headers_parsed.select { |h| option != 'ID' && option != 'UNUSED' && h['treatment'] == option }
+    #
+    #     # for each filter_output add col to expression
+    #
+    #     if filter_output.length > 0
+    #       filter_output.each do |header|
+    #
+    #         col_index = headers_parsed.index(header)
+    #
+    #         puts "col #{col_index}"
+    #
+    #         CSV.foreach(file.tempfile.path, :headers => true) { |row|
+    #           expression = row[col_index]
+    #           experiment = header['name']
+    #           gene = row[gene_col]
+    #           treatment = header['treatment']
+    #           time = time_fuck(header['time'])
+    #           repetition = header['repetition']
+    #           csv << %W(#{expression} #{experiment} #{gene} #{treatment} #{time} #{repetition})
+    #         }
+    #       end
+    #     end
+    #   end
+    # end
 
-      treatments.each do |option|
-
-        id = headers_parsed.select { |h| h['treatment'] == 'ID' }[0]
-
-        gene_col = headers_parsed.index(id)
-
-        # filter out unused and ID
-        filter_output = headers_parsed.select { |h| option != 'ID' && option != 'UNUSED' && h['treatment'] == option }
-
-        # for each filter_output add col to expression
-
-        if filter_output.length > 0
-          filter_output.each do |header|
-
-            col_index = headers_parsed.index(header)
-
-            puts "col #{col_index}"
-
-            CSV.foreach(file.tempfile.path, :headers => true) { |row|
-              expression = row[col_index]
-              experiment = header['name']
-              gene = row[gene_col]
-              treatment = header['treatment']
-              time = time_fuck(header['time'])
-              repetition = header['repetition']
-              csv << %W(#{expression} #{experiment} #{gene} #{treatment} #{time} #{repetition})
-            }
-          end
-        end
-      end
-    end
-
+    timestamp = '1411391204501'
 
     myr.eval <<EOF
     source('gene_nets/functions.R')
     load_libraries()
 
-    raw_filename = "public/tmp/tmp-#{timpstamp}.csv"
+    raw_filename = "public/tmp/tmp-#{timestamp}.csv"
     data <- read.csv(raw_filename, header = TRUE)
 
-    data[data == 0] <- NA
+    data[data == 0] <- 0
 
     treatments <- unique(data$treatment)
 
     for(t in treatments){
 
       expressions <- subset(data, treatment == t)
+      mock_nodelabels <- get_nodelabels(expressions)
 
-      # print(expressions)
+
+      # x <- 10
+      # mock <- get_diff_expressed(expressions, x, t)
+
 
       mock_long <- make_longitudinal(expressions)
+      # CHECK
+      is.longitudinal(mock_long)
 
+      limit_mock_long = head(mock_long, n=1000)
+
+      y <- 250
+      print('making net... This will take some time!')
+
+      mock_edges <- make_net(limit_mock_long, y)
+      print('...finished making net')
+
+
+      print('mock edges')
+      print(head(mock_edges))
+
+      # mock_igr <- network.make.igraph(mock_edges, mock_edges)
     }
 
 EOF

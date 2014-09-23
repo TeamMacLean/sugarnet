@@ -53,11 +53,16 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
+    toggleUploadLoading = function(){
+        $('#upload-spinner').toggle();
+    };
+
     $scope.upload = function () {
         var fd = new FormData();
         angular.forEach($scope.files, function (file) {
             fd.append('file', file)
         });
+        toggleUploadLoading();
         $http.post('uploadCSV', fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
@@ -71,7 +76,12 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 $scope.reloadDefineOptions();
                 $scope.fillOptions();
                 $('#dataExplainHelp').show();
+                toggleUploadLoading();
+            })
+            .error(function(){
+                toggleUploadLoading();
             });
+
     };
 
     $scope.checkCompletion = function () {

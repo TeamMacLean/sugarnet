@@ -9,6 +9,15 @@
             <input type="file" file-input="files" class="center-block form-control auto-width">
             <button ng-click="upload()" class="btn btn-default center-block">Upload</button>
 
+            <div id="upload-spinner" class="spinner">
+                <h2>Processing...</h2>
+                <div class="rect1"></div>
+                <div class="rect2"></div>
+                <div class="rect3"></div>
+                <div class="rect4"></div>
+                <div class="rect5"></div>
+            </div>
+
         </div>
     </div>
 
@@ -88,7 +97,7 @@
     </div>
 
     <div id="results">
-        <div id="spinner" class="spinner">
+        <div id="result-spinner" class="spinner">
             <h2>Processing...</h2>
             <div class="rect1"></div>
             <div class="rect2"></div>

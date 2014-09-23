@@ -140,6 +140,10 @@ input {
     width: auto;
 }
 
+#upload-spinner {
+    display: none;
+}
+
 #results {
     display: none;
 }
