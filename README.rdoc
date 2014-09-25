@@ -2,6 +2,10 @@
 
 RoTool is a tool.
 
+Original code: Dan Maclean
+Rewrite into app: Martin Page
+Development help:
+
 --TODO
 
 All the tings

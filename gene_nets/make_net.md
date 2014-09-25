@@ -312,18 +312,18 @@ library(plyr)
 
 
 # Change the node color and size based on node degree and betweenness values
-plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", 
+plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub",
     "sink"), axLab.pos = 1)
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-61.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-61.png)
 
 ```r
-plotHive(avr_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", 
+plotHive(avr_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub",
     "sink"), axLab.pos = 1)
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-62.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-62.png)
 
 ```r
 plotHive(vir_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", 
@@ -337,8 +337,7 @@ plotHive(flg22_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub"
     "sink"), axLab.pos = 1)
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-64.png) 
-
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-64.png)
 
 
 ```r

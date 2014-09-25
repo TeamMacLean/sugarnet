@@ -1,3 +1,4 @@
+/*just the one font!*/
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,700);
 
 body {
@@ -9,7 +10,6 @@ body {
 #logo {
     background-color: #556270;
     color: #ECF0F1;
-    /*margin-bottom: 20px;*/
     padding: 20px
 }
 
@@ -92,8 +92,6 @@ h1, h2, h3, h4 {
 
 input[type="text"] {
     padding: 8px;
-    /*background-color: #ECF0F1;*/
-    /*border:none;*/
 }
 
 #dataExplainHelp {
@@ -115,12 +113,10 @@ input[type="text"] {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    background-image: none;
-    border: 1px solid transparent;
     border-radius: 4px;
     color: #333;
-    background-color: #fff;
-    border-color: #ccc;
+    background: #fff none;
+    border: 1px solid #ccc;
 }
 
 .non-btn .close {
@@ -153,7 +149,7 @@ input {
     color: #ECF0F1;
 }
 
-#music{
+#music {
     display: none;
 }
 

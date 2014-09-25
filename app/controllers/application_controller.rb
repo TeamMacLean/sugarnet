@@ -114,6 +114,8 @@ class ApplicationController < ActionController::Base
 
     mock_array <- list()
 
+    euler_array <- list()
+
     for(t in treatments){
 
     print(t)
@@ -142,10 +144,16 @@ class ApplicationController < ActionController::Base
       library(plyr)
       plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
 
-      library(venneuler)
-      library(stringr)
-      mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
+      # library(venneuler)
+      # library(stringr)
+      # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
+      # c(euler_array, mock_genes)
+
+
     }
+
+# euler <- make_fourway_euler_diagram(euler_array)
+# plot(euler)
 
 
 union <- graph.union(mock_array)
