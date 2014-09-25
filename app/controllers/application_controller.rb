@@ -112,7 +112,11 @@ class ApplicationController < ActionController::Base
 
     treatments <- unique(data$treatment)
 
+    mock_array <- list()
+
     for(t in treatments){
+
+    print(t)
 
       expressions <- subset(data, treatment == t)
 
@@ -128,10 +132,29 @@ class ApplicationController < ActionController::Base
         mock_edges <- make_net(mock_long, y)
       dev.off()
 
-print('mocking')
-      mock_igr <- network.make.igraph(mock_edges, mock_edges)
-print('mocking END')
+      mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
+      c(mock_array, mock_igr)
+
+
+      library("HiveR")
+      mock_hive <- make_annotated_hive(mock_igr)
+
+      library(plyr)
+      plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+
+      library(venneuler)
+      library(stringr)
+      mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
     }
+
+
+union <- graph.union(mock_array)
+
+plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+
+plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+
+
 
 EOF
     myr.quit
