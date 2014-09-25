@@ -115,30 +115,22 @@ class ApplicationController < ActionController::Base
     for(t in treatments){
 
       expressions <- subset(data, treatment == t)
-      mock_nodelabels <- get_nodelabels(expressions)
 
+      x <- 10
+      mock <- get_diff_expressed(expressions, x, t)
 
-      # x <- 10
-      # mock <- get_diff_expressed(expressions, x, t)
+      mock_nodelabels <- get_nodelabels(mock)
 
-
-      mock_long <- make_longitudinal(expressions)
-      # CHECK
-      is.longitudinal(mock_long)
-
-      limit_mock_long = head(mock_long, n=1000)
+      mock_long <- make_longitudinal(mock)
 
       y <- 250
-      print('making net... This will take some time!')
+      jpeg('rplot.jpg')
+        mock_edges <- make_net(mock_long, y)
+      dev.off()
 
-      mock_edges <- make_net(limit_mock_long, y)
-      print('...finished making net')
-
-
-      print('mock edges')
-      print(head(mock_edges))
-
-      # mock_igr <- network.make.igraph(mock_edges, mock_edges)
+print('mocking')
+      mock_igr <- network.make.igraph(mock_edges, mock_edges)
+print('mocking END')
     }
 
 EOF

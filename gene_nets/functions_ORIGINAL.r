@@ -59,6 +59,8 @@ make_longitudinal <- function(df){
 
 make_net <- function(long,num_edges){
   pcc <- ggm.estimate.pcor(long)
+  print('pcc')
+  print(pcc)
   edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
   net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
   return(net)

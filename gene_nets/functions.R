@@ -42,20 +42,44 @@ load_libraries <- function(){
 #}
 #
 
+
 get_diff_expressed <- function(df,x, name){
     data <- make_it_like_dans(df)
     cols <- get_cols(df)
-#    print(head(data))
 
+first <- cols[[1]]
+
+first_means <- rowMeans(subset(data, select = first), na.rm = TRUE)
+
+rest <- cols[-1]
+
+prev = NULL
+
+for(c in rest){
+    h <- rowMeans(subset(data, select = c), na.rm = TRUE)
+
+    current <- abs(log2(h / first_means)) > log2(x)
+
+    if(!is.null(prev)){
+        prev <- current | prev
+    } else {
+        prev <- current
+    }
+}
+
+df <- df[prev,]
+df <- na.omit(df)
+return(df)
+
+
+#keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
+
+
+#  cols <- get_cols(name)
 #  df$mean_1h <- rowMeans(subset(df, select = cols[[1]]), na.rm = TRUE)
 #  df$mean_6h <- rowMeans(subset(df, select = cols[[2]]), na.rm = TRUE)
 #  df$mean_12h <- rowMeans(subset(df, select = cols[[3]]), na.rm = TRUE)
-    for(c in cols){
-        h <- rowMeans(subset(data, select = c), na.rm = TRUE)
-    }
-
-    keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
-
+#  df$keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
 #  df <- df[df$keep,]
 #  df$keep <- NULL
 #  df <- na.omit(df)
@@ -159,19 +183,10 @@ lon <- as.longitudinal(m, repeats=reps, time=times)
 
 make_net <- function(long,num_edges){
 
-#print(head(long))
-
-#true.pcor <- ggm.simulate.pcor(40)
-#m.sim <- ggm.simulate.data(40, true.pcor)
-#test = ggm.estimate.pcor(m.sim)
-
-#print(head(m.sim))
-#print(head(long))
-
   pcc <- ggm.estimate.pcor(long)
-#  edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
-#  net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
-#  return(net)
+  edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
+  net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
+  return(net)
 }
 
 ##needs a dataframe with 2 cols, in_edge, out_edge
