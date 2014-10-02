@@ -66,44 +66,44 @@ class ApplicationController < ActionController::Base
 
     timestamp = DateTime.now.strftime('%Q')
 
-    # puts "writing to tmp-#{timestamp}.csv"
-    #
-    # CSV.open("public/tmp/tmp-#{timestamp}.csv", 'wb') do |csv|
-    #   csv << %w(expression experiment gene treatment time rep)
-    #
-    #   treatments.each do |option|
-    #
-    #     id = headers_parsed.select { |h| h['treatment'] == 'ID' }[0]
-    #
-    #     gene_col = headers_parsed.index(id)
-    #
-    #     # filter out unused and ID
-    #     filter_output = headers_parsed.select { |h| option != 'ID' && option != 'UNUSED' && h['treatment'] == option }
-    #
-    #     # for each filter_output add col to expression
-    #
-    #     if filter_output.length > 0
-    #       filter_output.each do |header|
-    #
-    #         col_index = headers_parsed.index(header)
-    #
-    #         puts "processing col #{col_index}..."
-    #
-    #         CSV.foreach(file.tempfile.path, :headers => true) { |row|
-    #           expression = row[col_index]
-    #           experiment = header['name']
-    #           gene = row[gene_col]
-    #           treatment = header['treatment']
-    #           time = time_fuck(header['time'])
-    #           repetition = header['repetition']
-    #           csv << %W(#{expression} #{experiment} #{gene} #{treatment} #{time} #{repetition})
-    #         }
-    #       end
-    #     end
-    #   end
-    # end
+    puts "writing to tmp-#{timestamp}.csv"
 
-    timestamp = '1412253936218'
+    CSV.open("public/tmp/tmp-#{timestamp}.csv", 'wb') do |csv|
+      csv << %w(expression experiment gene treatment time rep)
+
+      treatments.each do |option|
+
+        id = headers_parsed.select { |h| h['treatment'] == 'ID' }[0]
+
+        gene_col = headers_parsed.index(id)
+
+        # filter out unused and ID
+        filter_output = headers_parsed.select { |h| option != 'ID' && option != 'UNUSED' && h['treatment'] == option }
+
+        # for each filter_output add col to expression
+
+        if filter_output.length > 0
+          filter_output.each do |header|
+
+            col_index = headers_parsed.index(header)
+
+            puts "processing col #{col_index}..."
+
+            CSV.foreach(file.tempfile.path, :headers => true) { |row|
+              expression = row[col_index]
+              experiment = header['name']
+              gene = row[gene_col]
+              treatment = header['treatment']
+              time = time_fuck(header['time'])
+              repetition = header['repetition']
+              csv << %W(#{expression} #{experiment} #{gene} #{treatment} #{time} #{repetition})
+            }
+          end
+        end
+      end
+    end
+
+    # timestamp = '1412253936218'
 
     myr.eval <<EOF
 
