@@ -154,37 +154,42 @@ class ApplicationController < ActionController::Base
       mock_hive <- make_annotated_hive(mock_igr)
 
       library(plyr)
-      jpeg(paste(output_folder,paste0(t,'-hive.jpeg')))
+      name <- paste(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
+      graphs <- c(graphs, name)
+      jpeg(name)
       plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
       dev.off()
 
-      # library(venneuler)
-      # library(stringr)
-      # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
-      # c(euler_array, mock_genes)
+      library(venneuler)
+      library(stringr)
+      mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
+      c(euler_array, mock_genes)
 
     }
 
-# euler <- make_fourway_euler_diagram(euler_array)
-# plot(euler)
+euler <- make_fourway_euler_diagram(euler_array)
+plot(euler)
 
 
-# union <- graph.union(mock_array)
+union <- graph.union(mock_array)
+name <- paste(output_folder,paste0(t,'-c-igr-#{timestamp}.jpeg'))
+graphs <- c(graphs, name)
+jpeg(name)
+plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+dev.off()
 
-# jpeg('mock_igr.jpg'))
-# plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-# dev.off()
+union <- graph.union(mock_array)
+name <- paste(output_folder,paste0(t,'-c-hive-#{timestamp}.jpeg'))
+graphs <- c(graphs, name)
+jpeg(name)
 
-# jpeg('mock_hive.jpg'))
-# plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-# dev.off()
+plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+dev.off()
 
 
 EOF
 
  graphs =  myr.pull('as.vector(graphs)')
-
-
 
     myr.quit
 
