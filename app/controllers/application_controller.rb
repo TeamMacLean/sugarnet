@@ -139,7 +139,7 @@ class ApplicationController < ActionController::Base
 
       y <- 250
 
-      name <- paste(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
+      name <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
       graphs <- c(graphs, name)
       jpeg(name)
       mock_edges <- make_net(mock_long, y)
@@ -154,7 +154,7 @@ class ApplicationController < ActionController::Base
       mock_hive <- make_annotated_hive(mock_igr)
 
       library(plyr)
-      name <- paste(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
+      name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
       graphs <- c(graphs, name)
       jpeg(name)
       plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
@@ -172,14 +172,14 @@ plot(euler)
 
 
 union <- graph.union(mock_array)
-name <- paste(output_folder,paste0(t,'-c-igr-#{timestamp}.jpeg'))
+name <- paste0(output_folder,paste0(t,'-c-igr-#{timestamp}.jpeg'))
 graphs <- c(graphs, name)
 jpeg(name)
 plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
 dev.off()
 
 union <- graph.union(mock_array)
-name <- paste(output_folder,paste0(t,'-c-hive-#{timestamp}.jpeg'))
+name <- paste0(output_folder,paste0(t,'-c-hive-#{timestamp}.jpeg'))
 graphs <- c(graphs, name)
 jpeg(name)
 
