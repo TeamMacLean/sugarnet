@@ -45,6 +45,10 @@ class ApplicationController < ActionController::Base
   def get_results
     require 'rinruby'
     require 'csv'
+    require 'time'
+
+
+    time_start = Time.now
 
     myr = RinRuby.new(:echo => R_ECHO)
 
@@ -62,9 +66,9 @@ class ApplicationController < ActionController::Base
 
     timestamp = DateTime.now.strftime('%Q')
 
-    puts "writing to tmp-#{timestamp}.csv"
-
-    # CSV.open("public/tmp/tmp-#{timpstamp}.csv", 'wb') do |csv|
+    # puts "writing to tmp-#{timestamp}.csv"
+    #
+    # CSV.open("public/tmp/tmp-#{timestamp}.csv", 'wb') do |csv|
     #   csv << %w(expression experiment gene treatment time rep)
     #
     #   treatments.each do |option|
@@ -83,7 +87,7 @@ class ApplicationController < ActionController::Base
     #
     #         col_index = headers_parsed.index(header)
     #
-    #         puts "col #{col_index}"
+    #         puts "processing col #{col_index}..."
     #
     #         CSV.foreach(file.tempfile.path, :headers => true) { |row|
     #           expression = row[col_index]
@@ -99,9 +103,14 @@ class ApplicationController < ActionController::Base
     #   end
     # end
 
-    timestamp = '1411391204501'
+    timestamp = '1412253936218'
 
     myr.eval <<EOF
+
+    graphs <- vector()
+
+    output_folder <- 'public/graphs/'
+
     source('gene_nets/functions.R')
     load_libraries()
 
@@ -118,10 +127,9 @@ class ApplicationController < ActionController::Base
 
     for(t in treatments){
 
-    print(t)
+      print(paste0("Current working on: ", t))
 
       expressions <- subset(data, treatment == t)
-
       x <- 10
       mock <- get_diff_expressed(expressions, x, t)
 
@@ -130,8 +138,12 @@ class ApplicationController < ActionController::Base
       mock_long <- make_longitudinal(mock)
 
       y <- 250
-      jpeg('rplot.jpg')
-        mock_edges <- make_net(mock_long, y)
+
+      name <- paste(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
+      graphs <- c(graphs, name)
+      jpeg(name)
+      mock_edges <- make_net(mock_long, y)
+      dev.off()
       dev.off()
 
       mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
@@ -142,13 +154,14 @@ class ApplicationController < ActionController::Base
       mock_hive <- make_annotated_hive(mock_igr)
 
       library(plyr)
+      jpeg(paste(output_folder,paste0(t,'-hive.jpeg')))
       plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+      dev.off()
 
       # library(venneuler)
       # library(stringr)
       # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
       # c(euler_array, mock_genes)
-
 
     }
 
@@ -156,17 +169,46 @@ class ApplicationController < ActionController::Base
 # plot(euler)
 
 
-union <- graph.union(mock_array)
+# union <- graph.union(mock_array)
 
-plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+# jpeg('mock_igr.jpg'))
+# plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+# dev.off()
 
-plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-
+# jpeg('mock_hive.jpg'))
+# plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+# dev.off()
 
 
 EOF
+
+ graphs =  myr.pull('as.vector(graphs)')
+
+
+
     myr.quit
-    render :text => 'temp end point'
+
+    time_end = Time.now
+    time_diff(time_start,time_end)
+
+    render :json => graphs
 
   end
+
+  def time_diff(start_time, end_time)
+
+    seconds_diff = (start_time - end_time).to_i.abs
+
+    hours = seconds_diff / 3600
+    seconds_diff -= hours * 3600
+
+    minutes = seconds_diff / 60
+    seconds_diff -= minutes * 60
+
+    seconds = seconds_diff
+
+    puts "Time to completion: #{hours.to_s.rjust(2, '0')}:#{minutes.to_s.rjust(2, '0')}:#{seconds.to_s.rjust(2, '0')}"
+
+  end
+
 end

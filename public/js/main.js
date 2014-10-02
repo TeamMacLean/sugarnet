@@ -159,12 +159,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 headers: {'Content-Type': undefined}
             })
                 .success(function (d) {
-                    toggleResultsView();
-                    /*
-                     TODO SHOULD GET A BUNCH OF URLS FOR IMAGES IN RETURN
-                     these should be divided by treatment
-                     */
-                    console.log('success', d);
+                    $scope.processResults(d);
                 })
                 .error(function (err) {
                     toggleResultsView();
@@ -174,6 +169,21 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         postIt($scope.headers);
     };
 
+
+    $scope.processResults = function(result){
+
+        if($scope.devMode){
+            console.log('results:', result);
+        }
+
+        var res = result;
+
+        if(res && res.success == 'true'){
+        //    all is good
+        }
+
+        toggleResultsView();
+    };
 
     $scope.fillOptions = function () {
         _.forEach($scope.headers, function (head) {

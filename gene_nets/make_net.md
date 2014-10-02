@@ -371,7 +371,7 @@ plot(rand_euler)
 
 
 ```r
-write.table(get.edgelist(mock_igr), "mock_edges.txt", col.names = FALSE, row.names = FALSE)
+ make_net
 write.table(get.edgelist(avr_igr), "avr_edges.txt", col.names = FALSE, row.names = FALSE)
 write.table(get.edgelist(vir_igr), "vir_edges.txt", col.names = FALSE, row.names = FALSE)
 write.table(get.edgelist(flg22_igr), "flg22_edges.txt", col.names = FALSE, row.names = FALSE)

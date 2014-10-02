@@ -17,32 +17,6 @@ load_libraries <- function(){
   a <- lapply(list.of.packages, require, character.only=T)  
 }
 
-#get_diff_expressed <- function(df,x, name){
-#
-#
-#  uniqueTime <- unique(df$time)
-#
-#    for(ut in uniqueTime){
-#        expressions <- subset(df, time == uniqueTime)
-#    }
-#
-#
-#  cols <- get_cols(name)
-#
-#  df$mean_1h <- rowMeans(subset(df, select = cols[[1]]), na.rm = TRUE)
-#  df$mean_6h <- rowMeans(subset(df, select = cols[[2]]), na.rm = TRUE)
-#  df$mean_12h <- rowMeans(subset(df, select = cols[[3]]), na.rm = TRUE)
-#
-#  df$keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
-#
-#  df <- df[df$keep,]
-#  df$keep <- NULL
-#  df <- na.omit(df)
-#  return(df)
-#}
-#
-
-
 get_diff_expressed <- function(df,x, name){
     data <- make_it_like_dans(df)
     cols <- get_cols(df)
@@ -70,20 +44,6 @@ for(c in rest){
 df <- df[prev,]
 df <- na.omit(df)
 return(df)
-
-
-#keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
-
-
-#  cols <- get_cols(name)
-#  df$mean_1h <- rowMeans(subset(df, select = cols[[1]]), na.rm = TRUE)
-#  df$mean_6h <- rowMeans(subset(df, select = cols[[2]]), na.rm = TRUE)
-#  df$mean_12h <- rowMeans(subset(df, select = cols[[3]]), na.rm = TRUE)
-#  df$keep <- abs(log2(df$mean_6h / df$mean_1h)) > log2(x) |  abs(log2(df$mean_12h / df$mean_1h)) > log2(x)
-#  df <- df[df$keep,]
-#  df$keep <- NULL
-#  df <- na.omit(df)
-#  return(df)
 }
 
 
@@ -101,28 +61,13 @@ get_cols <- function(df){
         sub <- subset(df, time == t)
 
         re <- as.vector(unique(sub$experiment))
-#        print(re)
         slist[[i]] <- re
 
         i<-i+1
     }
-
-#    print(slist)
 return(slist)
 }
 
-
-#get_cols <- function(name){
-#  if (name == "MOCK"){
-#    return(list(c("MOCK_1_1", "MOCK_1_2"),c("MOCK_6_1", "MOCK_6_2"),c("MOCK_12_1", "MOCK_12_2")))
-#  }
-#  if (name == "AVR"){
-#    return(list(c("AVR_1_1", "AVR_1_2"),c("AVR_6_1", "AVR_6_2"),c("AVR_12_1", "AVR_12_2")))
-#  }
-#  if (name == "VIR"){
-#    return(list(c("VIR_1_1", "VIR_1_2"),c("VIR_6_1", "VIR_6_2"),c("VIR_12_1", "VIR_12_2")))
-#  }
-#}
 
 make_it_like_dans <- function(expressions, getID = TRUE){
       uniqueExperiments <- unique(expressions$experiment)
