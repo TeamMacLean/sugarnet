@@ -107,10 +107,6 @@ class ApplicationController < ActionController::Base
 
     myr.eval <<EOF
 
-library(doParallel)
-cl<-makeCluster(2)
-registerDoParallel(cl)
-
     graphs <- vector()
 
     output_folder <- 'public/graphs/'
@@ -189,10 +185,6 @@ jpeg(name)
 
 plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
 dev.off()
-
-
-
-stopCluster(cl)
 
 
 EOF
