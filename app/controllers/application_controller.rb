@@ -122,7 +122,8 @@ class ApplicationController < ActionController::Base
     data <- read.csv(raw_filename, header = TRUE)
 
     # clean up dataset
-    data[data == 0] <- NA
+    # data[data == 0] <- NA
+
 
     # get list of treatments
     treatments <- unique(data$treatment)
@@ -155,11 +156,10 @@ class ApplicationController < ActionController::Base
       graphics.off()
 
       # THIS IS A DIRTY LITTLE HACK
-      mock_edges_no_na <- na.omit(mock_edges)
+      mock_edges <- na.omit(mock_edges)
 
-      mock_igr <- network.make.igraph(mock_edges_no_na, mock_nodelabels)
-
-      union_array <- c(union_array, mock_igr)
+      mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
+      union_array <- append(union_array, mock_igr)
 
       name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
       graphs <- c(graphs, name)
@@ -168,26 +168,32 @@ class ApplicationController < ActionController::Base
       graphics.off()
 
       # SAME AS ABOVE BUT AUTO AND BLUE
-      # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
-      # graphs <- c(graphs, name)
-      # jpeg(name)
-      # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
-      # graphics.off()
+      name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
+      graphs <- c(graphs, name)
+      jpeg(name)
+      plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
+      graphics.off()
 
 
-      # library("HiveR")
-      # library(plyr)
-      # mock_hive <- make_annotated_hive(mock_igr)
-      # name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
-      # graphs <- c(graphs, name)
-      # jpeg(name)
-      # plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-      # graphics.off()
+      # BROKEN :(
 
-      # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
-      # graphs <- c(graphs, name)
-      # make_net
-      # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
+      library("HiveR")
+      mock_hive <- make_annotated_hive(mock_igr)
+      library(plyr)
+      name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
+      graphs <- c(graphs, name)
+      jpeg(name)
+      plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+      graphics.off()
+
+
+      # TABLE OUTPUT
+      name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
+      graphs <- c(graphs, name)
+      make_net
+      write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
+
+
 
     }
 
@@ -197,7 +203,8 @@ class ApplicationController < ActionController::Base
   # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
   # graphs <- c(graphs, name)
   # jpeg(name)
-  # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+  #   plot(union, layout = layout.auto)
+  #   # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
   # graphics.off()
 
 
