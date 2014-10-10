@@ -20,9 +20,6 @@ load_libraries <- function(){
 get_diff_expressed <- function(df,x, name){
     data <- make_it_like_dans(df)
 
-#    print(data) #should be 1428 is 14285
-
-
     cols <- get_cols(df)
 
     first <- cols[[1]]
@@ -45,11 +42,9 @@ get_diff_expressed <- function(df,x, name){
             }
     }
 
-    df <- df[prev,]
-    df <- na.omit(df)
-    #print(df)
-    #109764
-    return(df)
+    data <- data[prev,]
+    data <- na.omit(data)
+    return(data)
 }
 
 
@@ -109,21 +104,19 @@ make_it_like_dans <- function(expressions, getID = TRUE){
 }
 
 
-make_longitudinal <- function(df){
+make_longitudinal <- function(df, expressions){
 
-    times <- unique(df$time)
+    df$gene <- NULL
 
-    reps_pre <- max(unique(df$rep))
-
+    times <- unique(expressions$time)
+    reps_pre <- max(unique(expressions$rep))
     reps <- c()
     for(t in times){
-    reps <- append(reps, reps_pre)
+        reps <- append(reps, reps_pre)
     }
 
     m <- t(as.matrix(df))
 
-
-print(m)
 #    print(reps)
 #    print(times)
 
@@ -133,9 +126,9 @@ print(m)
 
 make_net <- function(long,num_edges){
   pcc <- ggm.estimate.pcor(long)
-#  edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
-#  net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
-#  return(net)
+  edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
+  net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
+  return(net)
 }
 
 ##needs a dataframe with 2 cols, in_edge, out_edge

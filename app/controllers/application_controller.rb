@@ -109,6 +109,8 @@ class ApplicationController < ActionController::Base
     # output array
     graphs <- vector()
 
+    union_array <- list()
+
     # path of output images
     output_folder <- 'public/graphs/'
 
@@ -121,13 +123,12 @@ class ApplicationController < ActionController::Base
 
     # clean up dataset
     data[data == 0] <- NA
-    # data[data == 0] <- 0
 
     # get list of treatments
     treatments <- unique(data$treatment)
 
     # create empty lists
-    mock_array <- list()
+    # mock_array <- list()
     euler_array <- list()
 
     for(t in treatments){
@@ -136,7 +137,6 @@ class ApplicationController < ActionController::Base
       graphs <- c(graphs, t)
       print(paste0("Current working on: ", t))
 
-
       expressions <- subset(data, treatment == t)
 
       x <- 10
@@ -144,38 +144,46 @@ class ApplicationController < ActionController::Base
 
       mock_nodelabels <- get_nodelabels(mock)
 
-      mock_long <- make_longitudinal(mock)
+      mock_long <- make_longitudinal(mock, expressions)
 
       y <- 250
 
       name <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
       graphs <- c(graphs, name)
       jpeg(name)
-# print(mock_long)
-# print(head(mock_long))
-      # mock_edges <- make_net(mock_long, y)
+      mock_edges <- make_net(mock_long, y)
+      graphics.off()
+
+      # THIS IS A DIRTY LITTLE HACK
+      mock_edges_no_na <- na.omit(mock_edges)
+
+      mock_igr <- network.make.igraph(mock_edges_no_na, mock_nodelabels)
+
+      union_array <- c(union_array, mock_igr)
+
+      name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
+      graphs <- c(graphs, name)
+      jpeg(name)
+      plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+      graphics.off()
+
+      # SAME AS ABOVE BUT AUTO AND BLUE
+      # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
+      # graphs <- c(graphs, name)
+      # jpeg(name)
+      # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
       # graphics.off()
-      #
-      # mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
-      # c(mock_array, mock_igr)
-      #
-      #
+
+
       # library("HiveR")
-      # mock_hive <- make_annotated_hive(mock_igr)
-      #
       # library(plyr)
+      # mock_hive <- make_annotated_hive(mock_igr)
       # name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
       # graphs <- c(graphs, name)
       # jpeg(name)
       # plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
       # graphics.off()
-      #
-      # # library(venneuler)
-      # # library(stringr)
-      # # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
-      # # c(euler_array, mock_genes)
-      #
-      #
+
       # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
       # graphs <- c(graphs, name)
       # make_net
@@ -183,35 +191,28 @@ class ApplicationController < ActionController::Base
 
     }
 
-# graphs <- c(graphs, 'combined')
-#
-# name <- paste0(output_folder,'igr-#{timestamp}.jpeg')
-# graphs <- c(graphs, name)
-# graphics.off()
-# jpeg(name)
-# plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-# graphics.off()
+  graphs <- c(graphs, 'combined')
 
-
-  #     ERROR MAKING THIS GRAPH
-  # union <- graph.union(as.list(mock_array))
-  # name <- paste0(output_folder,paste0(t,'-c-union-#{timestamp}.jpeg'))
+  # union <- graph.union(union_array)
+  # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
   # graphs <- c(graphs, name)
   # jpeg(name)
   # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
   # graphics.off()
 
+
+
 EOF
 
 
-    # graphs = myr.pull('as.vector(graphs)')
+    graphs = myr.pull('as.vector(graphs)')
     myr.quit
 
     time_end = Time.now
     time_diff(time_start, time_end)
 
-    render :text => 'hello'
-    # render :json => graphs
+    # render :text => 'hello'
+    render :json => graphs
 
   end
 
