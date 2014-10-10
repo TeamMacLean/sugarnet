@@ -88,7 +88,7 @@ class ApplicationController < ActionController::Base
             col_index = headers_parsed.index(header)
 
             puts "processing col #{col_index}..."
-
+            # example = 42187 long
             CSV.foreach(file.tempfile.path, :headers => true) { |row|
               expression = row[col_index]
               experiment = header['name']
@@ -106,30 +106,39 @@ class ApplicationController < ActionController::Base
     # timestamp = '1412253936218'
 
     myr.eval <<EOF
-
+    # output array
     graphs <- vector()
 
+    # path of output images
     output_folder <- 'public/graphs/'
 
     source('gene_nets/functions.R')
     load_libraries()
 
+    # read input
     raw_filename = "public/tmp/tmp-#{timestamp}.csv"
     data <- read.csv(raw_filename, header = TRUE)
 
-    data[data == 0] <- 0
+    # clean up dataset
+    data[data == 0] <- NA
+    # data[data == 0] <- 0
 
+    # get list of treatments
     treatments <- unique(data$treatment)
 
+    # create empty lists
     mock_array <- list()
-
     euler_array <- list()
 
     for(t in treatments){
 
+      # treatment name
+      graphs <- c(graphs, t)
       print(paste0("Current working on: ", t))
 
+
       expressions <- subset(data, treatment == t)
+
       x <- 10
       mock <- get_diff_expressed(expressions, x, t)
 
@@ -142,61 +151,67 @@ class ApplicationController < ActionController::Base
       name <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
       graphs <- c(graphs, name)
       jpeg(name)
-      mock_edges <- make_net(mock_long, y)
-      dev.off()
-      dev.off()
-
-      mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
-      c(mock_array, mock_igr)
-
-
-      library("HiveR")
-      mock_hive <- make_annotated_hive(mock_igr)
-
-      library(plyr)
-      name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
-      graphs <- c(graphs, name)
-      jpeg(name)
-      plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-      dev.off()
-
-      # library(venneuler)
-      # library(stringr)
-      # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
-      # c(euler_array, mock_genes)
+# print(mock_long)
+# print(head(mock_long))
+      # mock_edges <- make_net(mock_long, y)
+      # graphics.off()
+      #
+      # mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
+      # c(mock_array, mock_igr)
+      #
+      #
+      # library("HiveR")
+      # mock_hive <- make_annotated_hive(mock_igr)
+      #
+      # library(plyr)
+      # name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
+      # graphs <- c(graphs, name)
+      # jpeg(name)
+      # plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+      # graphics.off()
+      #
+      # # library(venneuler)
+      # # library(stringr)
+      # # mock_genes <- str_sub(V(mock_igr)$name, 1, 9)
+      # # c(euler_array, mock_genes)
+      #
+      #
+      # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
+      # graphs <- c(graphs, name)
+      # make_net
+      # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
 
     }
 
-# euler <- make_fourway_euler_diagram(euler_array)
-# plot(euler)
-
-
-# union <- graph.union(mock_array)
-# name <- paste0(output_folder,paste0(t,'-c-igr-#{timestamp}.jpeg'))
+# graphs <- c(graphs, 'combined')
+#
+# name <- paste0(output_folder,'igr-#{timestamp}.jpeg')
 # graphs <- c(graphs, name)
+# graphics.off()
 # jpeg(name)
 # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-# dev.off()
+# graphics.off()
 
-# union <- graph.union(mock_array)
-# name <- paste0(output_folder,paste0(t,'-c-hive-#{timestamp}.jpeg'))
-# graphs <- c(graphs, name)
-# jpeg(name)
 
-# plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-# dev.off()
-
+  #     ERROR MAKING THIS GRAPH
+  # union <- graph.union(as.list(mock_array))
+  # name <- paste0(output_folder,paste0(t,'-c-union-#{timestamp}.jpeg'))
+  # graphs <- c(graphs, name)
+  # jpeg(name)
+  # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+  # graphics.off()
 
 EOF
 
- graphs =  myr.pull('as.vector(graphs)')
 
+    # graphs = myr.pull('as.vector(graphs)')
     myr.quit
 
     time_end = Time.now
-    time_diff(time_start,time_end)
+    time_diff(time_start, time_end)
 
-    render :json => graphs
+    render :text => 'hello'
+    # render :json => graphs
 
   end
 

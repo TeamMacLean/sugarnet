@@ -72,8 +72,8 @@ h1, h2, h3, h4 {
     margin-bottom: 20px;
 }
 
-#results img {
-    margin-bottom: 100px;
+#results {
+    padding-top: 30px;
 }
 
 #treatmentList {
@@ -153,6 +153,12 @@ input {
     display: none;
 }
 
+.centerImage {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .spinner {
     margin: 100px auto;
     width: 200px;
@@ -189,6 +195,14 @@ input {
 .spinner .rect5 {
     -webkit-animation-delay: -0.8s;
     animation-delay: -0.8s;
+}
+
+.centerText {
+    text-align: center;
+}
+
+.mb {
+    margin-bottom: 40px;
 }
 
 @-webkit-keyframes stretchdelay {

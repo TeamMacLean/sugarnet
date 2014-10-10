@@ -52,8 +52,12 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
-    toggleUploadLoading = function () {
+    var toggleUploadLoading = function () {
         $('#upload-spinner').toggle();
+    };
+
+    var toggleResultLoading = function () {
+        $('#result-spinner').toggle();
     };
 
     $scope.upload = function () {
@@ -170,19 +174,45 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
 
-    $scope.processResults = function(result){
+    $scope.processResults = function (result) {
 
-        if($scope.devMode){
+        //result should already be parsed json (angular does it by its self)
+
+        if ($scope.devMode) {
             console.log('results:', result);
         }
 
-        var res = result;
+        if (result) {
+            //result.forEach(function (res) {
+            async.eachSeries(result, function (res, callback) {
 
-        if(res && res.success == 'true'){
-        //    all is good
+                if (res.indexOf("public") > -1) {
+
+                    var path = res.split('public').pop();
+                    var fileType = path.split('.').pop();
+
+                    if (fileType == 'jpeg') {
+                        $('<img src="' + path + '">').load(function () {
+                            $(this).addClass('img-responsive').addClass('centerImage').addClass('mb').appendTo('#results');
+                            callback();
+                        })
+                    }
+                    else if (fileType == 'txt') {
+                        $('<h2><a href="' + path + '" target="_blank">Edges</a></h2>').addClass('centerText').addClass('mb').appendTo('#results');
+                        callback();
+                    } else {
+                        callback();
+                    }
+                } else {
+                    $('<h1>' + res + '</h1>').addClass('centerText').addClass('mb').appendTo('#results');
+                    callback();
+                }
+            }, function () {
+                toggleResultLoading();
+            });
+        } else {
+            $('<h1>There was an error.</h1>').appendTo('#results');
         }
-
-        toggleResultsView();
     };
 
     $scope.fillOptions = function () {
@@ -192,7 +222,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         $scope.checkCompletion();
     };
 
-    //TODO get rid of this ASAP
+//TODO get rid of this ASAP
     $scope.devFill = function () {
         $scope.treatments = ['MOCK', 'AVR', 'VIR'];
         $scope.reloadDefineOptions();
@@ -313,5 +343,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     }
 
 
-}]);
+}])
+;
 

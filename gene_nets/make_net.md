@@ -40,12 +40,9 @@ Subset the FPKM into one `data.frame` for each treatment.
 data[data == 0] <- NA
 
 # subset
-mock <- data[c("tracking_id", "MOCK_1_1", "MOCK_1_2", "MOCK_6_1", "MOCK_6_2", 
-    "MOCK_12_1", "MOCK_12_2")]
-avr <- data[c("tracking_id", "AVR_1_1", "AVR_1_2", "AVR_6_1", "AVR_6_2", "AVR_12_1", 
-    "AVR_12_2")]
-vir <- data[c("tracking_id", "VIR_1_1", "VIR_1_2", "VIR_6_1", "VIR_6_2", "VIR_12_1", 
-    "VIR_12_2")]
+mock <- data[c("tracking_id", "MOCK_1_1", "MOCK_1_2", "MOCK_6_1", "MOCK_6_2", "MOCK_12_1", "MOCK_12_2")]
+avr <- data[c("tracking_id", "AVR_1_1", "AVR_1_2", "AVR_6_1", "AVR_6_2", "AVR_12_1", "AVR_12_2")]
+vir <- data[c("tracking_id", "VIR_1_1", "VIR_1_2", "VIR_6_1", "VIR_6_2", "VIR_12_1", "VIR_12_2")]
 ```
 
 

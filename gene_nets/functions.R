@@ -19,31 +19,37 @@ load_libraries <- function(){
 
 get_diff_expressed <- function(df,x, name){
     data <- make_it_like_dans(df)
+
+#    print(data) #should be 1428 is 14285
+
+
     cols <- get_cols(df)
 
-first <- cols[[1]]
+    first <- cols[[1]]
 
-first_means <- rowMeans(subset(data, select = first), na.rm = TRUE)
+    first_means <- rowMeans(subset(data, select = first), na.rm = TRUE)
 
-rest <- cols[-1]
+    rest <- cols[-1]
 
-prev = NULL
+    prev = NULL
 
-for(c in rest){
-    h <- rowMeans(subset(data, select = c), na.rm = TRUE)
+    for(c in rest){
+            h <- rowMeans(subset(data, select = c), na.rm = TRUE)
 
-    current <- abs(log2(h / first_means)) > log2(x)
+            current <- abs(log2(h / first_means)) > log2(x)
 
-    if(!is.null(prev)){
-        prev <- current | prev
-    } else {
-        prev <- current
+            if(!is.null(prev)){
+                prev <- current | prev
+            } else {
+                prev <- current
+            }
     }
-}
 
-df <- df[prev,]
-df <- na.omit(df)
-return(df)
+    df <- df[prev,]
+    df <- na.omit(df)
+    #print(df)
+    #109764
+    return(df)
 }
 
 
@@ -97,41 +103,39 @@ make_it_like_dans <- function(expressions, getID = TRUE){
         mock[,u] <- ue$expression
         }
       }
+
+#      mock[mock == 0] <- NA
       return(mock)
 }
 
 
 make_longitudinal <- function(df){
 
-#print(df)
+    times <- unique(df$time)
 
-times <- unique(df$time)
+    reps_pre <- max(unique(df$rep))
 
-reps_pre <- max(unique(df$rep))
-reps <- c()
-for(t in times){
-reps <- append(reps, reps_pre)
-}
+    reps <- c()
+    for(t in times){
+    reps <- append(reps, reps_pre)
+    }
+
+    m <- t(as.matrix(df))
 
 
+print(m)
+#    print(reps)
+#    print(times)
 
-dd <- make_it_like_dans(df, TRUE)
-
-dd$gene <- NULL
-
-m <- t(as.matrix(dd))
-
-lon <- as.longitudinal(m, repeats=reps, time=times)
-
-  return(lon)
+    lon <- as.longitudinal(m, repeats=reps, time=times)
+    return(lon)
 }
 
 make_net <- function(long,num_edges){
-
   pcc <- ggm.estimate.pcor(long)
-  edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
-  net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
-  return(net)
+#  edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
+#  net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
+#  return(net)
 }
 
 ##needs a dataframe with 2 cols, in_edge, out_edge
