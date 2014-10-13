@@ -17,39 +17,39 @@ load_libraries <- function(){
   a <- lapply(list.of.packages, require, character.only=T)  
 }
 
-get_diff_expressed <- function(df,x, name){
-
-    cols <- get_cols(df)
-
-    first <- cols[[1]]
-
-    first_means <- rowMeans(subset(data, select = first), na.rm = TRUE)
-
-    rest <- cols[-1]
-
-    prev = NULL
-
-    for(c in rest){
-            h <- rowMeans(subset(data, select = c), na.rm = TRUE)
-
-            current <- abs(log2(h / first_means)) > log2(x)
-
-            if(!is.null(prev)){
-                prev <- current | prev
-            } else {
-                prev <- current
-            }
-    }
-
-    data <- data[prev,]
-    data <- na.omit(data)
-    return(data)
-}
+#get_diff_expressed <- function(df,x, name){
+#
+#    cols <- get_cols(df)
+#
+#    first <- cols[[1]]
+#
+#    first_means <- rowMeans(subset(data, select = first), na.rm = TRUE)
+#
+#    rest <- cols[-1]
+#
+#    prev = NULL
+#
+#    for(c in rest){
+#            h <- rowMeans(subset(data, select = c), na.rm = TRUE)
+#
+#            current <- abs(log2(h / first_means)) > log2(x)
+#
+#            if(!is.null(prev)){
+#                prev <- current | prev
+#            } else {
+#                prev <- current
+#            }
+#    }
+#
+#    data <- data[prev,]
+#    data <- na.omit(data)
+#    return(data)
+#}
 
 
 get_nodelabels <- function(df){
-#return(unique(df$gene))
-  return(df$gene)
+return(unique(df$gene))
+#  return(df$gene)
 }
 
 get_cols <- function(df){
@@ -111,11 +111,14 @@ make_longitudinal <- function(df, expressions){
 }
 
 make_net <- function(long,num_edges){
+
+#this makes two images
   pcc <- ggm.estimate.pcor(long)
   edges <- network.test.edges(pcc, direct=TRUE,fdr=TRUE)
   net <- extract.network(edges,method.ggm="number",cutoff.ggm=num_edges)
   return(net)
 }
+
 
 ##needs a dataframe with 2 cols, in_edge, out_edge
 make_hive <- function(df){

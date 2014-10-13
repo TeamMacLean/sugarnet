@@ -151,7 +151,6 @@ class ApplicationController < ActionController::Base
 
       mock_long <- make_longitudinal(mock, expressions)
 
-
       y <- 250
 
       name <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
@@ -165,7 +164,9 @@ class ApplicationController < ActionController::Base
 
 
       mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
-      union_array <- append(union_array, mock_igr)
+
+      # union_array <- c(union_array, mock_igr)
+      union_array[[length(union_array)+1]] <- mock_igr
 
       name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
       graphs <- c(graphs, name)
@@ -180,8 +181,6 @@ class ApplicationController < ActionController::Base
       plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
       graphics.off()
 
-
-      # BROKEN :(
 
       library("HiveR")
       mock_hive <- make_annotated_hive(mock_igr)
@@ -203,16 +202,13 @@ class ApplicationController < ActionController::Base
 
     }
 
-  # graphs <- c(graphs, 'combined')
-
-  # union <- graph.union(union_array)
-  # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
-  # graphs <- c(graphs, name)
-  # jpeg(name)
-  # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
-  # graphics.off()
-
-
+  graphs <- c(graphs, 'combined')
+  union <- graph.union(union_array)
+  name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
+  graphs <- c(graphs, name)
+  jpeg(name)
+  plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+  graphics.off()
 
 EOF
 
