@@ -66,9 +66,11 @@ class ApplicationController < ActionController::Base
 
     timestamp = DateTime.now.strftime('%Q')
 
-    puts "writing to tmp-#{timestamp}.csv"
+    tmpCSV = "public/tmp/tmp-#{timestamp}.csv"
 
-    CSV.open("public/tmp/tmp-#{timestamp}.csv", 'wb') do |csv|
+    puts tmpCSV
+
+    CSV.open(tmpCSV, 'wb') do |csv|
       csv << %w(expression experiment gene treatment time rep)
 
       treatments.each do |option|
@@ -106,9 +108,7 @@ class ApplicationController < ActionController::Base
     # timestamp = '1412253936218'
 
     myr.eval <<EOF
-    # output array
     graphs <- vector()
-
     union_array <- list()
 
     # path of output images
@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
     data <- read.csv(raw_filename, header = TRUE)
 
     # clean up dataset
-    # data[data == 0] <- NA
+    data[data == 0] <- NA
 
 
     # get list of treatments
@@ -130,6 +130,7 @@ class ApplicationController < ActionController::Base
 
     # create empty lists
     # mock_array <- list()
+
     euler_array <- list()
 
     for(t in treatments){
@@ -140,12 +141,16 @@ class ApplicationController < ActionController::Base
 
       expressions <- subset(data, treatment == t)
 
-      x <- 10
-      mock <- get_diff_expressed(expressions, x, t)
+
+      mock <- make_it_like_dans(expressions)
+
+      # x <- 10
+      # mock <- get_diff_expressed(df, x, t)
 
       mock_nodelabels <- get_nodelabels(mock)
 
       mock_long <- make_longitudinal(mock, expressions)
+
 
       y <- 250
 
@@ -156,7 +161,8 @@ class ApplicationController < ActionController::Base
       graphics.off()
 
       # THIS IS A DIRTY LITTLE HACK
-      mock_edges <- na.omit(mock_edges)
+      # mock_edges <- na.omit(mock_edges)
+
 
       mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
       union_array <- append(union_array, mock_igr)
@@ -197,20 +203,20 @@ class ApplicationController < ActionController::Base
 
     }
 
-  graphs <- c(graphs, 'combined')
+  # graphs <- c(graphs, 'combined')
 
   # union <- graph.union(union_array)
   # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
   # graphs <- c(graphs, name)
   # jpeg(name)
-  #   plot(union, layout = layout.auto)
-  #   # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+  # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
   # graphics.off()
 
 
 
 EOF
 
+    File.delete(tmpCSV) if File.exist?(tmpCSV)
 
     graphs = myr.pull('as.vector(graphs)')
     myr.quit

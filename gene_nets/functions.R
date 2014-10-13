@@ -18,7 +18,6 @@ load_libraries <- function(){
 }
 
 get_diff_expressed <- function(df,x, name){
-    data <- make_it_like_dans(df)
 
     cols <- get_cols(df)
 
@@ -49,7 +48,8 @@ get_diff_expressed <- function(df,x, name){
 
 
 get_nodelabels <- function(df){
-  return(unique(df$gene))
+#return(unique(df$gene))
+  return(df$gene)
 }
 
 get_cols <- function(df){
@@ -70,24 +70,17 @@ return(slist)
 }
 
 
-make_it_like_dans <- function(expressions, getID = TRUE){
+make_it_like_dans <- function(expressions){
       uniqueExperiments <- unique(expressions$experiment)
       idGetter <- subset(expressions , experiment == uniqueExperiments[1])
 
       id <- idGetter["gene"]
 
-        mock = NULL
-
-      if(getID){
         mock <- data.frame(id)
-      }
 
       for(u in uniqueExperiments){
         ttt = subset(expressions , experiment == u)
         ue <- ttt["expression"]
-
-#        mock$paste(u) <- NA
-
 
         if(!is.data.frame(mock)){
         mock <- data.frame(ue$expression)
@@ -97,25 +90,22 @@ make_it_like_dans <- function(expressions, getID = TRUE){
         }
       }
 
-#      mock[mock == 0] <- NA
+    mock <- na.omit(mock)
+
       return(mock)
 }
 
 
 make_longitudinal <- function(df, expressions){
-
     df$gene <- NULL
-
+    rownames(df) <- NULL
     times <- unique(expressions$time)
     reps_pre <- max(unique(expressions$rep))
-    reps <- c()
+    reps <- vector()
     for(t in times){
-        reps <- append(reps, reps_pre)
+        reps <- c(reps, reps_pre)
     }
-
     m <- t(as.matrix(df))
-
-
     lon <- as.longitudinal(m, repeats=reps, time=times)
     return(lon)
 }
