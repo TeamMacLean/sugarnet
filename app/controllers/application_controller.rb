@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # Beware, The following code sucks ass, trying to make sense of it is not a good idea.
   # All code was hacked together with no understanding on how to use R
 
-  R_ECHO = true
+  R_ECHO = false #DEBUG
 
   def upload_csv
     file_input = params[:file]
