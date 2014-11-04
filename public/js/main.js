@@ -196,16 +196,16 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 newDiv.addClass('cy');
                 newDiv.find('h3').remove();
 
-                console.log('network', network);
-                console.log('names', names);
-
                 var nodes = [];
                 var edges = [];
 
                 _.forEach(network, function (ob) {
-                    var node1 = ob.node1.toString();
-                    var node2 = ob.node2.toString();
+                    var node1Int = ob.node1;
+                    var node2Int = ob.node2;
+                    var node1 = node1Int.toString();
+                    var node2 = node2Int.toString();
                     var newID = node1 + '' + node2;
+
 
                     var weight = ob['qval.dir'].toString();
 
@@ -216,11 +216,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     var foundNodeTwo = _.where(nodes, {data: { id: node2 }});
 
                     if (_.isEmpty(foundNode)) {
-                        var nodeA = {data: {id: node1, name: names[node1]}};
+                        var name = names[node1Int - 1]; //start from 0
+                        var nodeA = {data: {id: node1, name: name}};
                         nodes.push(nodeA);
                     }
                     if (_.isEmpty(foundNodeTwo)) {
-                        var nodeB = {data: {id: node2, name: names[node2]}};
+                        var name = names[node2Int - 1]; //start from 0
+                        var nodeB = {data: {id: node2, name: name}};
                         nodes.push(nodeB);
                     }
                 });

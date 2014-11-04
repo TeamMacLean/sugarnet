@@ -181,18 +181,18 @@ cat(myjson, file=name)
       # union_array <- c(union_array, mock_igr)
       union_array[[length(union_array)+1]] <- mock_igr
 
-  # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
-  # graphs <- c(graphs, name)
-  # jpeg(name)
-  # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-  # graphics.off()
+  name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
+  graphs <- c(graphs, name)
+  jpeg(name)
+  plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+  graphics.off()
 
   # SAME AS ABOVE BUT AUTO AND BLUE
-  # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
-  # graphs <- c(graphs, name)
-  # jpeg(name)
-  # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
-  # graphics.off()
+  name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
+  graphs <- c(graphs, name)
+  jpeg(name)
+  plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
+  graphics.off()
 
 
       library("HiveR")
