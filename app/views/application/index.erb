@@ -4,7 +4,7 @@
 
         <div class="container">
 
-            <h1>1. Upload your CSV file</h1>
+            <h1 class="alignLeft">1. Upload your CSV file</h1>
 
             <input type="file" file-input="files" class="center-block form-control auto-width">
             <button ng-click="upload()" class="btn btn-default center-block">Upload</button>
@@ -24,7 +24,7 @@
 
     <div id="stepTwo">
         <div class="container">
-            <h1>2. Treatments</h1>
+            <h1 class="alignLeft">2. Treatments</h1>
 
             <form ng-submit="addTreatment(header)">
                 <input type="text" ng-model="header" class="center-block form-control auto-width" placeholder="treatment name">
@@ -43,7 +43,7 @@
 
     <div id="stepThree">
         <div class="container">
-            <h1>3. Explain the data</h1>
+            <h1 class="alignLeft">3. Explain the data</h1>
 
             <div class="row" id="dataExplainHelp">
                 <div class="col-xs-2">
@@ -112,11 +112,6 @@
             Your browser does not support the audio element.
         </audio>
 
-    </div>
-
-    <div id="footer">
-        <h3>Developed by <a href="http://twitter.com/biodevops">Martin Page</a> of
-            <a href="danmaclean.info">Team Maclean.</a></h3>
     </div>
 
 

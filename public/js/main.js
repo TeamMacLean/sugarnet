@@ -186,15 +186,18 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     var injectGraph = function (network, names, cb) {
 
         var tmpID = makeid();
-        var newDiv = $('<div></div>');
-        newDiv.attr('id', tmpID).addClass('mb');
-        $('<h3>Click to load interactive graph</h3>').addClass('cyText').appendTo(newDiv);
-        newDiv.appendTo('#results');
-        newDiv.click(function () {
+        var cyWrapper = $('<div></div>').addClass('cyWrapper').addClass('mb');
+        var cyHolder = $('<div></div>').appendTo(cyWrapper);
+        cyHolder.attr('id', tmpID)
 
-            if (!newDiv.hasClass('cy')) {
-                newDiv.addClass('cy');
-                newDiv.find('h3').remove();
+
+        $('<h3>Click to load interactive graph</h3>').addClass('cyText').appendTo(cyHolder);
+        cyWrapper.appendTo('#results');
+        cyHolder.click(function () {
+
+            if (!cyHolder.hasClass('cy')) {
+                cyHolder.addClass('cy');
+                cyHolder.find('h3').remove();
 
                 var nodes = [];
                 var edges = [];
@@ -233,8 +236,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     }
                 });
 
-                console.log(edges);
-
                 var cy = cytoscape({
                     container: document.getElementById(tmpID),
 
@@ -243,8 +244,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         .css({
                             'content': 'data(name)',
 //                            'background-color': '#1ABC9C'
-                            'border-width':'1',
-                            'border-style':'solid',
+                            'border-width': '1',
+                            'border-style': 'solid',
                             'border-color': '#585858',
                             'background-opacity': '0'
                         })
@@ -279,8 +280,69 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         padding: 10
                     }
                 });
+
+                var layoutOptions = {
+//                    random: 'random',
+//                    preset: 'preset',
+                    grid: 'grid',
+                    circle: 'circle',
+                    concentric: 'concentric',
+                    breadthfirst: 'breadthfirst',
+//                    dagre: 'dagre',
+                    cose: 'cose'
+//                    cola: 'cola',
+//                    arbor: 'arbor',
+//                    springy: 'springy'
+
+                };
+                var layoutSelect = $('<select></select>').attr('id', '#layouts' + tmpID);
+                layoutSelect.appendTo(cyWrapper);
+                $.each(layoutOptions, function (val, text) {
+                    layoutSelect.append(
+                        $('<option></option>').val(text).html(val)
+                    );
+                });
+                layoutSelect.change(function () {
+                    var newLayout = $(this).val();
+                    console.log(newLayout);
+                    cy.layout({ name: newLayout });
+                });
+
+                var edgeColor = {
+                    turqoise: '#1ABC9C',
+                    emerald: '#2ECC71',
+                    peterRiver: '#3498DB',
+                    amethyst: '#9B59B6',
+                    wetAsphalt: '#34495E',
+                    sunFlower: '#F1C40F',
+                    carrot: '#E67E22',
+                    alizarin: '#E74C3C',
+                    clouds: '#ECF0F1',
+                    concrete: '##95A5A6'
+                };
+                var edgeColorSelect = $('<select></select>').attr('id', '#colors' + tmpID);
+                edgeColorSelect.appendTo(cyWrapper);
+                $.each(edgeColor, function (val, text) {
+                    edgeColorSelect.append(
+                        $('<option></option>').val(text).html(val)
+                    );
+                });
+                edgeColorSelect.change(function () {
+                    console.log(cy);
+                    var newEdgeColor = $(this).val();
+                    cy.style().selector('edge').css('line-color', newEdgeColor).update();
+                    cy.style().selector('edge').css('target-arrow-color', newEdgeColor).update();
+                });
+
+                $('<button>Export PNG</button>').click(function () {
+                    cy.png();
+                }).appendTo(cyWrapper);
+                $('<button>Export JSON</button>').click(function () {
+                    cy.json();
+                }).appendTo(cyWrapper);
             }
         });
+
         cb();
     };
 
