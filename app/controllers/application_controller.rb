@@ -111,6 +111,8 @@ class ApplicationController < ActionController::Base
     graphs <- vector()
     union_array <- list()
 
+json_array <- list()
+
     # path of output images
     output_folder <- 'public/graphs/'
 
@@ -162,24 +164,35 @@ class ApplicationController < ActionController::Base
       # THIS IS A DIRTY LITTLE HACK
       # mock_edges <- na.omit(mock_edges)
 
+library("jsonlite")
+myjson <- toJSON(mock_edges)
+name <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
+graphs <- c(graphs, name)
+cat(myjson, file=name)
+
+myjson <- toJSON(mock_nodelabels)
+name <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
+graphs <- c(graphs, name)
+cat(myjson, file=name)
+
 
       mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
 
       # union_array <- c(union_array, mock_igr)
       union_array[[length(union_array)+1]] <- mock_igr
 
-      name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
-      graphs <- c(graphs, name)
-      jpeg(name)
-      plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-      graphics.off()
+  # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
+  # graphs <- c(graphs, name)
+  # jpeg(name)
+  # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+  # graphics.off()
 
-      # SAME AS ABOVE BUT AUTO AND BLUE
-      name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
-      graphs <- c(graphs, name)
-      jpeg(name)
-      plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
-      graphics.off()
+  # SAME AS ABOVE BUT AUTO AND BLUE
+  # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
+  # graphs <- c(graphs, name)
+  # jpeg(name)
+  # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
+  # graphics.off()
 
 
       library("HiveR")
@@ -210,11 +223,13 @@ class ApplicationController < ActionController::Base
   plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
   graphics.off()
 
+
 EOF
 
     File.delete(tmpCSV) if File.exist?(tmpCSV)
 
     graphs = myr.pull('as.vector(graphs)')
+
     myr.quit
 
     time_end = Time.now

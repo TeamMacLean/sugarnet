@@ -205,6 +205,25 @@ input {
     margin-bottom: 40px;
 }
 
+.cyText {
+    width:480px;
+    padding-top: 20px;
+    padding-bottom:20px;
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #C7F464;
+    cursor: pointer;
+}
+
+.cy {
+    height: 480px;
+    width: 480px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @-webkit-keyframes stretchdelay {
     0%, 40%, 100% {
         -webkit-transform: scaleY(0.4)

@@ -173,6 +173,106 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         postIt($scope.headers);
     };
 
+    var makeid = function () {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 8; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    };
+
+    var injectGraph = function (network, names, cb) {
+
+        var tmpID = makeid();
+        var newDiv = $('<div></div>');
+        newDiv.attr('id', tmpID).addClass('mb');
+        $('<h3>Click to load interactive graph</h3>').addClass('cyText').appendTo(newDiv);
+        newDiv.appendTo('#results');
+        newDiv.click(function () {
+
+            if (!newDiv.hasClass('cy')) {
+                newDiv.addClass('cy');
+                newDiv.find('h3').remove();
+
+                console.log('network', network);
+                console.log('names', names);
+
+                var nodes = [];
+                var edges = [];
+
+                _.forEach(network, function (ob) {
+                    var node1 = ob.node1.toString();
+                    var node2 = ob.node2.toString();
+                    var newID = node1 + '' + node2;
+
+                    var weight = ob['qval.dir'].toString();
+
+                    var edge = {data: {id: newID, weight: weight, source: node1, target: node2}};
+                    edges.push(edge);
+
+                    var foundNode = _.where(nodes, {data: { id: node1 }});
+                    var foundNodeTwo = _.where(nodes, {data: { id: node2 }});
+
+                    if (_.isEmpty(foundNode)) {
+                        var nodeA = {data: {id: node1, name: names[node1]}};
+                        nodes.push(nodeA);
+                    }
+                    if (_.isEmpty(foundNodeTwo)) {
+                        var nodeB = {data: {id: node2, name: names[node2]}};
+                        nodes.push(nodeB);
+                    }
+                });
+
+
+                var cy = cytoscape({
+                    container: document.getElementById(tmpID),
+
+                    style: cytoscape.stylesheet()
+                        .selector('node')
+                        .css({
+                            'content': 'data(name)',
+                            'background-color': '#1ABC9C'
+                        })
+                        .selector('edge')
+                        .css({
+                            'width': '2',
+                            'target-arrow-shape': 'triangle',
+                            'line-color': '#F1C40F',
+                            'target-arrow-color': '#F1C40F'
+                        })
+                        .selector('.highlighted')
+                        .css({
+                            'background-color': '#ECF0F1',
+                            'line-color': '#ECF0F1',
+                            'target-arrow-color': '#61bffc',
+                            'transition-property': 'background-color, line-color, target-arrow-color',
+                            'transition-duration': '0.5s'
+                        }),
+
+                    elements: {
+                        nodes: nodes,
+                        edges: edges
+                    },
+
+                    layout: {
+                        name: 'cose',
+                        padding: 10
+                    }
+                });
+            }
+        });
+        cb();
+    };
+
+    var processNetwork = function (json, njson, cb) {
+        $.getJSON(json, function (network) {
+            $.getJSON(njson, function (names) {
+                injectGraph(network, names, cb);
+            });
+        });
+    };
 
     $scope.processResults = function (result) {
 
@@ -183,7 +283,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
 
         if (result) {
-            //result.forEach(function (res) {
+
+            var currentJsonPath = '';
+
             async.eachSeries(result, function (res, callback) {
 
                 if (res.indexOf("public") > -1) {
@@ -196,6 +298,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                             $(this).addClass('img-responsive').addClass('centerImage').addClass('mb').appendTo('#results');
                             callback();
                         })
+                    }
+                    else if (fileType == 'json') {
+                        currentJsonPath = path;
+                        callback();
+                    }
+                    else if (fileType == 'njson') {
+                        processNetwork(currentJsonPath, path, callback);
                     }
                     else if (fileType == 'txt') {
                         $('<h2><a href="' + path + '" target="_blank">Edges</a></h2>').addClass('centerText').addClass('mb').appendTo('#results');
@@ -226,123 +335,142 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.devFill = function () {
         $scope.treatments = ['MOCK', 'AVR', 'VIR'];
         $scope.reloadDefineOptions();
-        $scope.headers = [{"name": "gene_id", "treatment": "UNUSED", "$$hashKey": "003"}, {
-            "name": "tracking_id",
-            "treatment": "ID",
-            "$$hashKey": "004"
-        }, {
-            "name": "MOCK_1_1",
-            "treatment": "MOCK",
-            "$$hashKey": "005",
-            "repetition": 1,
-            "time": {"hours": 1}
-        }, {
-            "name": "AVR_1_1",
-            "treatment": "AVR",
-            "$$hashKey": "006",
-            "repetition": 1,
-            "time": {"hours": 1}
-        }, {
-            "name": "VIR_1_1",
-            "treatment": "VIR",
-            "$$hashKey": "007",
-            "repetition": 1,
-            "time": {"hours": 1}
-        }, {
-            "name": "MOCK_6_1",
-            "treatment": "MOCK",
-            "$$hashKey": "008",
-            "repetition": 1,
-            "time": {"hours": 6}
-        }, {
-            "name": "AVR_6_1",
-            "treatment": "AVR",
-            "$$hashKey": "009",
-            "repetition": 1,
-            "time": {"hours": 6}
-        }, {
-            "name": "VIR_6_1",
-            "treatment": "VIR",
-            "$$hashKey": "00A",
-            "repetition": 1,
-            "time": {"hours": 6}
-        }, {
-            "name": "MOCK_12_1",
-            "treatment": "MOCK",
-            "$$hashKey": "00B",
-            "repetition": 1,
-            "time": {"hours": 12}
-        }, {
-            "name": "AVR_12_1",
-            "treatment": "AVR",
-            "$$hashKey": "00C",
-            "repetition": 1,
-            "time": {"hours": 12}
-        }, {
-            "name": "VIR_12_1",
-            "treatment": "VIR",
-            "$$hashKey": "00D",
-            "repetition": 1,
-            "time": {"hours": 12}
-        }, {
-            "name": "MOCK_1_2",
-            "treatment": "MOCK",
-            "$$hashKey": "00E",
-            "repetition": 2,
-            "time": {"hours": 1}
-        }, {
-            "name": "AVR_1_2",
-            "treatment": "AVR",
-            "$$hashKey": "00F",
-            "repetition": 2,
-            "time": {"hours": 1}
-        }, {
-            "name": "VIR_1_2",
-            "treatment": "VIR",
-            "$$hashKey": "00G",
-            "repetition": 2,
-            "time": {"hours": 1}
-        }, {
-            "name": "MOCK_6_2",
-            "treatment": "MOCK",
-            "$$hashKey": "00H",
-            "repetition": 2,
-            "time": {"hours": 6}
-        }, {
-            "name": "AVR_6_2",
-            "treatment": "AVR",
-            "$$hashKey": "00I",
-            "repetition": 2,
-            "time": {"hours": 6}
-        }, {
-            "name": "VIR_6_2",
-            "treatment": "VIR",
-            "$$hashKey": "00J",
-            "repetition": 2,
-            "time": {"hours": 6}
-        }, {
-            "name": "MOCK_12_2",
-            "treatment": "MOCK",
-            "$$hashKey": "00K",
-            "repetition": 2,
-            "time": {"hours": 12}
-        }, {
-            "name": "AVR_12_2",
-            "treatment": "AVR",
-            "$$hashKey": "00L",
-            "repetition": 2,
-            "time": {"hours": 12}
-        }, {
-            "name": "VIR_12_2",
-            "treatment": "VIR",
-            "$$hashKey": "00M",
-            "repetition": 2,
-            "time": {"hours": 12}
-        }];
+        $scope.headers = [
+            {"name": "gene_id", "treatment": "UNUSED", "$$hashKey": "003"},
+            {
+                "name": "tracking_id",
+                "treatment": "ID",
+                "$$hashKey": "004"
+            },
+            {
+                "name": "MOCK_1_1",
+                "treatment": "MOCK",
+                "$$hashKey": "005",
+                "repetition": 1,
+                "time": {"hours": 1}
+            },
+            {
+                "name": "AVR_1_1",
+                "treatment": "AVR",
+                "$$hashKey": "006",
+                "repetition": 1,
+                "time": {"hours": 1}
+            },
+            {
+                "name": "VIR_1_1",
+                "treatment": "VIR",
+                "$$hashKey": "007",
+                "repetition": 1,
+                "time": {"hours": 1}
+            },
+            {
+                "name": "MOCK_6_1",
+                "treatment": "MOCK",
+                "$$hashKey": "008",
+                "repetition": 1,
+                "time": {"hours": 6}
+            },
+            {
+                "name": "AVR_6_1",
+                "treatment": "AVR",
+                "$$hashKey": "009",
+                "repetition": 1,
+                "time": {"hours": 6}
+            },
+            {
+                "name": "VIR_6_1",
+                "treatment": "VIR",
+                "$$hashKey": "00A",
+                "repetition": 1,
+                "time": {"hours": 6}
+            },
+            {
+                "name": "MOCK_12_1",
+                "treatment": "MOCK",
+                "$$hashKey": "00B",
+                "repetition": 1,
+                "time": {"hours": 12}
+            },
+            {
+                "name": "AVR_12_1",
+                "treatment": "AVR",
+                "$$hashKey": "00C",
+                "repetition": 1,
+                "time": {"hours": 12}
+            },
+            {
+                "name": "VIR_12_1",
+                "treatment": "VIR",
+                "$$hashKey": "00D",
+                "repetition": 1,
+                "time": {"hours": 12}
+            },
+            {
+                "name": "MOCK_1_2",
+                "treatment": "MOCK",
+                "$$hashKey": "00E",
+                "repetition": 2,
+                "time": {"hours": 1}
+            },
+            {
+                "name": "AVR_1_2",
+                "treatment": "AVR",
+                "$$hashKey": "00F",
+                "repetition": 2,
+                "time": {"hours": 1}
+            },
+            {
+                "name": "VIR_1_2",
+                "treatment": "VIR",
+                "$$hashKey": "00G",
+                "repetition": 2,
+                "time": {"hours": 1}
+            },
+            {
+                "name": "MOCK_6_2",
+                "treatment": "MOCK",
+                "$$hashKey": "00H",
+                "repetition": 2,
+                "time": {"hours": 6}
+            },
+            {
+                "name": "AVR_6_2",
+                "treatment": "AVR",
+                "$$hashKey": "00I",
+                "repetition": 2,
+                "time": {"hours": 6}
+            },
+            {
+                "name": "VIR_6_2",
+                "treatment": "VIR",
+                "$$hashKey": "00J",
+                "repetition": 2,
+                "time": {"hours": 6}
+            },
+            {
+                "name": "MOCK_12_2",
+                "treatment": "MOCK",
+                "$$hashKey": "00K",
+                "repetition": 2,
+                "time": {"hours": 12}
+            },
+            {
+                "name": "AVR_12_2",
+                "treatment": "AVR",
+                "$$hashKey": "00L",
+                "repetition": 2,
+                "time": {"hours": 12}
+            },
+            {
+                "name": "VIR_12_2",
+                "treatment": "VIR",
+                "$$hashKey": "00M",
+                "repetition": 2,
+                "time": {"hours": 12}
+            }
+        ];
         $scope.checkCompletion();
-    }
-
-
+    };
 }])
 ;
 
