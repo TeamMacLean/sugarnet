@@ -257,7 +257,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         })
                         .selector('edge.questionable')
                         .css({
-                            'line-style': 'dotted',
+                            'line-style': 'dashed',
                             'target-arrow-shape': 'tee'
                         })
                         .selector('.highlighted')
