@@ -209,7 +209,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
                     var weight = ob['qval.dir'].toString();
 
-                    var edge = {data: {id: newID, weight: weight, source: node1, target: node2}};
+//                    var sin = Math.sin(ob.pcor);
+                    var questionable = '';
+                    if (Math.sin(ob.pcor) < 0) {
+                        questionable = 'questionable';
+                    }
+
+                    var edge = {data: {id: newID, weight: weight, source: node1, target: node2}, classes: questionable};
                     edges.push(edge);
 
                     var foundNode = _.where(nodes, {data: { id: node1 }});
@@ -227,6 +233,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     }
                 });
 
+                console.log(edges);
 
                 var cy = cytoscape({
                     container: document.getElementById(tmpID),
@@ -235,14 +242,23 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         .selector('node')
                         .css({
                             'content': 'data(name)',
-                            'background-color': '#1ABC9C'
+//                            'background-color': '#1ABC9C'
+                            'border-width':'1',
+                            'border-style':'solid',
+                            'border-color': '#585858',
+                            'background-opacity': '0'
                         })
                         .selector('edge')
                         .css({
                             'width': '2',
                             'target-arrow-shape': 'triangle',
-                            'line-color': '#F1C40F',
-                            'target-arrow-color': '#F1C40F'
+                            'line-color': '#C0392B',
+                            'target-arrow-color': '#C0392B'
+                        })
+                        .selector('edge.questionable')
+                        .css({
+                            'line-style': 'dotted',
+                            'target-arrow-shape': 'tee'
                         })
                         .selector('.highlighted')
                         .css({

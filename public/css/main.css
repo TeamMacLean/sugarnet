@@ -222,6 +222,7 @@ input {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    background-color: white;
 }
 
 @-webkit-keyframes stretchdelay {
