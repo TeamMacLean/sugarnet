@@ -173,6 +173,26 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         postIt($scope.headers);
     };
 
+    var ColorLuminance = function (hex, lum) {
+
+        // validate hex string
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        lum = lum || 0;
+
+        // convert to decimal and change luminosity
+        var rgb = "#", c, i;
+        for (i = 0; i < 3; i++) {
+            c = parseInt(hex.substr(i * 2, 2), 16);
+            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            rgb += ("00" + c).substr(c.length);
+        }
+
+        return rgb;
+    };
+
     var makeid = function () {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -210,15 +230,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     var newID = node1 + '' + node2;
 
 
-                    var weight = ob['qval.dir'].toString();
-
 //                    var sin = Math.sin(ob.pcor);
                     var questionable = '';
                     if (Math.sin(ob.pcor) < 0) {
                         questionable = 'questionable';
                     }
 
-                    var edge = {data: {id: newID, weight: weight, source: node1, target: node2}, classes: questionable};
+                    var edge = {data: {id: newID, source: node1, target: node2}, classes: questionable};
                     edges.push(edge);
 
                     var foundNode = _.where(nodes, {data: { id: node1 }});
@@ -236,77 +254,43 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     }
                 });
 
-                var cy = cytoscape({
-                    container: document.getElementById(tmpID),
+                var smallestNode = 99999999999;
+                var largestNode = 0;
 
-                    style: cytoscape.stylesheet()
-                        .selector('node')
-                        .css({
-                            'content': 'data(name)',
-//                            'background-color': '#1ABC9C'
-                            'border-width': '1',
-                            'border-style': 'solid',
-                            'border-color': '#585858',
-                            'background-opacity': '0'
-                        })
-                        .selector('edge')
-                        .css({
-                            'width': '2',
-                            'target-arrow-shape': 'triangle',
-                            'line-color': '#C0392B',
-                            'target-arrow-color': '#C0392B'
-                        })
-                        .selector('edge.questionable')
-                        .css({
-                            'line-style': 'dashed',
-                            'target-arrow-shape': 'tee'
-                        })
-                        .selector('.highlighted')
-                        .css({
-                            'background-color': '#ECF0F1',
-                            'line-color': '#ECF0F1',
-                            'target-arrow-color': '#61bffc',
-                            'transition-property': 'background-color, line-color, target-arrow-color',
-                            'transition-duration': '0.5s'
-                        }),
+//                TODO tell node about its connection count
+                _.forEach(nodes, function (node) {
+                    var count1 = _.where(edges, {data: {source: node.data.id}}).length;
+                    var count2 = _.where(edges, {data: {target: node.data.id}}).length;
 
-                    elements: {
-                        nodes: nodes,
-                        edges: edges
-                    },
-
-                    layout: {
-                        name: 'cose',
-                        padding: 10
+                    var count = count1 + count2;
+                    if (count > largestNode) {
+                        largestNode = count;
                     }
+                    if (count < smallestNode) {
+                        smallestNode = count;
+                    }
+                    node.data.weight = count;
                 });
+                var defaultNodeWidth = 30;
+                var defaultNodeHeight = 30;
+                var minNodeSize = 10;
+                var maxNodeSize = 50;
+
 
                 var layoutOptions = {
+                    cose: 'cose',
 //                    random: 'random',
 //                    preset: 'preset',
                     grid: 'grid',
                     circle: 'circle',
                     concentric: 'concentric',
-                    breadthfirst: 'breadthfirst',
+                    breadthfirst: 'breadthfirst'
 //                    dagre: 'dagre',
-                    cose: 'cose'
 //                    cola: 'cola',
 //                    arbor: 'arbor',
 //                    springy: 'springy'
 
                 };
-                var layoutSelect = $('<select></select>').attr('id', '#layouts' + tmpID);
-                layoutSelect.appendTo(cyWrapper);
-                $.each(layoutOptions, function (val, text) {
-                    layoutSelect.append(
-                        $('<option></option>').val(text).html(val)
-                    );
-                });
-                layoutSelect.change(function () {
-                    var newLayout = $(this).val();
-                    console.log(newLayout);
-                    cy.layout({ name: newLayout });
-                });
 
                 var edgeColor = {
                     turqoise: '#1ABC9C',
@@ -318,8 +302,97 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     carrot: '#E67E22',
                     alizarin: '#E74C3C',
                     clouds: '#ECF0F1',
-                    concrete: '##95A5A6'
+                    concrete: '#95A5A6'
                 };
+                var nodeColor = {
+                    turqoise: '#1ABC9C',
+                    emerald: '#2ECC71',
+                    peterRiver: '#3498DB',
+                    amethyst: '#9B59B6',
+                    wetAsphalt: '#34495E',
+                    sunFlower: '#F1C40F',
+                    carrot: '#E67E22',
+                    alizarin: '#E74C3C',
+                    clouds: '#ECF0F1',
+                    concrete: '#95A5A6'
+                };
+
+                var defaultNodeColor = edgeColor.wetAsphalt;
+                var defaultEdgeColor = nodeColor.concrete;
+                var defaultLayout = layoutOptions.cose;
+
+                var layout = {
+                    name: defaultLayout,
+                    padding: 10
+                };
+
+                var nodeCSS = {
+                    'width': defaultNodeWidth,
+                    'height': defaultNodeHeight,
+                    'content': 'data(name)',
+                    'background-color': defaultNodeColor
+
+                };
+
+                var edgeCSS = {
+                    'width': '2',
+                    'target-arrow-shape': 'triangle',
+                    'line-color': defaultEdgeColor,
+                    'target-arrow-color': defaultEdgeColor
+                };
+
+                var questionableCSS = {
+                    'line-style': 'dashed',
+                    'target-arrow-shape': 'tee'
+                };
+
+                var highlightedCSS = {
+                    'background-color': '#ECF0F1',
+                    'line-color': '#ECF0F1',
+                    'target-arrow-color': '#61bffc',
+                    'transition-property': 'background-color, line-color, target-arrow-color',
+                    'transition-duration': '0.5s'
+                };
+
+                var cy = cytoscape({
+                    container: document.getElementById(tmpID),
+
+                    style: cytoscape.stylesheet()
+                        .selector('node')
+                        .css(nodeCSS)
+                        .selector('edge')
+                        .css(edgeCSS)
+                        .selector('edge.questionable')
+                        .css(questionableCSS)
+                        .selector('.highlighted')
+                        .css(highlightedCSS),
+
+                    elements: {
+                        nodes: nodes,
+                        edges: edges
+                    },
+
+                    layout: layout
+                });
+
+
+                var layoutSelect = $('<select></select>').attr('id', '#layouts' + tmpID);
+                layoutSelect.appendTo(cyWrapper);
+                $.each(layoutOptions, function (val, text) {
+                    layoutSelect.append(
+                        $('<option></option>').val(text).html(val)
+                    );
+                });
+                layoutSelect.val(defaultLayout);
+                layoutSelect.change(function () {
+                    var newLayout = $(this).val();
+                    cy.layout({ name: newLayout });
+                });
+
+                var currentNodeColor = defaultNodeColor;
+//                var currentEdgeColor = defaultEdgeColor;
+
+//                edge color
                 var edgeColorSelect = $('<select></select>').attr('id', '#colors' + tmpID);
                 edgeColorSelect.appendTo(cyWrapper);
                 $.each(edgeColor, function (val, text) {
@@ -327,18 +400,60 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         $('<option></option>').val(text).html(val)
                     );
                 });
+                edgeColorSelect.val(defaultEdgeColor);
                 edgeColorSelect.change(function () {
-                    console.log(cy);
                     var newEdgeColor = $(this).val();
                     cy.style().selector('edge').css('line-color', newEdgeColor).update();
                     cy.style().selector('edge').css('target-arrow-color', newEdgeColor).update();
                 });
 
+//                node color
+                var nodeColorSelect = $('<select></select>').attr('id', '#colors' + tmpID);
+                nodeColorSelect.appendTo(cyWrapper);
+                $.each(nodeColor, function (val, text) {
+                    nodeColorSelect.append(
+                        $('<option></option>').val(text).html(val)
+                    );
+                });
+                nodeColorSelect.val(defaultNodeColor);
+                nodeColorSelect.change(function () {
+                    var newNodeColor = $(this).val();
+                    currentNodeColor = newNodeColor;
+                    cy.style().selector('node').css('background-color', newNodeColor).update();
+                });
+
+//                export png
                 $('<button>Export PNG</button>').click(function () {
-                    cy.png();
+                    alert(cy.png());
                 }).appendTo(cyWrapper);
+//                export json
                 $('<button>Export JSON</button>').click(function () {
-                    cy.json();
+                    alert(cy.json());
+                }).appendTo(cyWrapper);
+
+//                node size by degree
+                $('<input type="checkbox"/>').attr('id', '#nodeSizeByDegree' + tmpID).change(function () {
+                    if ($(this).is(':checked')) {
+                        var map = 'mapData(weight, ' + smallestNode + ', ' + largestNode + ', ' + minNodeSize + ', ' + maxNodeSize + ')';
+                        cy.style().selector('node').css('width', map).css('height', map).update();
+                    } else {
+//                        TODO set global default to restore to
+                        cy.style().selector('node').css('width', defaultNodeWidth).css('height', defaultNodeHeight).update();
+                    }
+                }).appendTo(cyWrapper);
+
+//                node color by degree
+                $('<input type="checkbox"/>').attr('id', '#nodeColoeByDegree' + tmpID).change(function () {
+                    if ($(this).is(':checked')) {
+
+                        var ligherColor = ColorLuminance(currentNodeColor, -0.40);
+                        var darkerColor = ColorLuminance(currentNodeColor, 0.40);
+
+                        var map = 'mapData(weight, ' + smallestNode + ', ' + largestNode + ', ' + ligherColor + ', ' + darkerColor + ')';
+                        cy.style().selector('node').css('background-color', map).update();
+                    } else {
+                        cy.style().selector('node').css('background-color', currentNodeColor).update();
+                    }
                 }).appendTo(cyWrapper);
             }
         });
