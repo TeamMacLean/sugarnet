@@ -420,6 +420,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     var newNodeColor = $(this).val();
                     currentNodeColor = newNodeColor;
                     cy.style().selector('node').css('background-color', newNodeColor).update();
+                    nodeColorByDegree();
                 });
 
 //                export png
@@ -443,8 +444,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 }).appendTo(cyWrapper);
 
 //                node color by degree
-                $('<input type="checkbox"/>').attr('id', '#nodeColoeByDegree' + tmpID).change(function () {
-                    if ($(this).is(':checked')) {
+                var nodeColorByDegreeCheckBox = $('<input type="checkbox"/>').attr('id', '#nodeColorByDegree' + tmpID);
+                var nodeColorByDegree = function () {
+                    if (nodeColorByDegreeCheckBox.is(':checked')) {
 
                         var ligherColor = ColorLuminance(currentNodeColor, -0.40);
                         var darkerColor = ColorLuminance(currentNodeColor, 0.40);
@@ -454,6 +456,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     } else {
                         cy.style().selector('node').css('background-color', currentNodeColor).update();
                     }
+                };
+                nodeColorByDegreeCheckBox.change(function () {
+                    nodeColorByDegree();
                 }).appendTo(cyWrapper);
             }
         });

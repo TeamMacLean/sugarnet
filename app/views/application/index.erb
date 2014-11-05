@@ -6,8 +6,12 @@
 
             <h1 class="alignLeft">1. Upload your CSV file</h1>
 
-            <input type="file" file-input="files" class="center-block form-control auto-width">
-            <button ng-click="upload()" class="btn btn-default center-block">Upload</button>
+            <div class="form-inline">
+                <div class="form-group">
+                    <input type="file" file-input="files" class="center-block form-control">
+                    <button ng-click="upload()" class="btn btn-default">Upload</button>
+                </div>
+            </div>
 
             <div id="upload-spinner" class="spinner">
                 <h2>Processing...</h2>
@@ -26,9 +30,9 @@
         <div class="container">
             <h1 class="alignLeft">2. Treatments</h1>
 
-            <form ng-submit="addTreatment(header)">
-                <input type="text" ng-model="header" class="center-block form-control auto-width" placeholder="treatment name">
-                <button class="btn btn-default center-block">add treatment</button>
+            <form ng-submit="addTreatment(header)" class="form-inline">
+                <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name">
+                <button class="btn btn-default">add Treatment</button>
             </form>
 
             <div ng-repeat="treatment in treatments">
@@ -92,8 +96,8 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-default center-block disabled" ng-click="getResults()">Submit</button>
-            <button class="btn btn-danger center-block" ng-click="devFill()">DEV CHEAT</button>
+            <button class="btn btn-default disabled" ng-click="getResults()">Submit</button>
+            <button class="btn btn-danger " ng-click="devFill()">DEV CHEAT</button>
         </div>
     </div>
 
