@@ -14,6 +14,7 @@ app.directive('fileInput', ['$parse', function ($parse) {
     }
 }]);
 
+// This does all the stuff, apart from the bit above, but we don't talk about that.
 app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.sessionID = null;
     $scope.headers = [];
@@ -23,8 +24,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.musicPlaying = false;
     $scope.files = [];
     $scope.devMode = true;
-
-
     $scope.resultBlocks = [];
 
     $scope.reloadDefineOptions = function () {
@@ -55,7 +54,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
     var toggleUploadLoading = function () {
-//        console.log('toggles');
         $('#upload-spinner').toggle();
     };
 
@@ -98,8 +96,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.checkCompletion = function () {
         if (!_.isEmpty($scope.files)) {
-//            console.log($scope.headers);
-//            if (!_.isEmpty($scope.headers)) {
             var withoutTreatment = false;
             _.forEach($scope.headers, function (header) {
                 if (_.isUndefined(header.treatment)) {
@@ -112,9 +108,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     btn.removeClass('disabled');
                 }
             }
-//            } else {
-//                console.log('no headers loaded');
-//            }
         } else {
             swal("Oops...", "No file found!", "error");
         }
@@ -182,6 +175,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         postIt($scope.headers);
     };
 
+    /**
+     * @return {string}
+     */
     var ColorLuminance = function (hex, lum) {
 
         // validate hex string
@@ -222,8 +218,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         thisBlock.defaultNodeHeight = 30;
         thisBlock.minNodeSize = 10;
         thisBlock.maxNodeSize = 50;
-        thisBlock.smallestNode = 99999999999;
-        thisBlock.largestNode = 0;
+        thisBlock.lowestEdgeCount = 99999999999;
+        thisBlock.highestEdgeCount = 0;
 
         thisBlock.layoutOptions = [
             {key: 'cose', value: 'cose'},
@@ -259,8 +255,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             {key: 'concrete', value: '#95A5A6'}
         ];
 
-        thisBlock.defaultNodeColor = thisBlock.edgeColors[1];
-        thisBlock.defaultEdgeColor = thisBlock.nodeColors[2];
+        thisBlock.defaultNodeColor = thisBlock.nodeColors[1];
+        thisBlock.defaultEdgeColor = thisBlock.edgeColors[2];
         thisBlock.defaultLayout = thisBlock.layoutOptions[2];
 
 
@@ -310,13 +306,16 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 $http.get(njson)
                     .success(function (data) {
                         var names = data;
+
                         _.forEach(network, function (ob) {
+
+                            console.log(ob);
+
                             var node1Int = ob.node1;
                             var node2Int = ob.node2;
                             var node1 = node1Int.toString();
                             var node2 = node2Int.toString();
                             var newID = node1 + '' + node2;
-
 
                             var questionable = '';
                             if (Math.sin(ob.pcor) < 0) {
@@ -347,17 +346,16 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                             var count2 = _.where(edges, {data: {target: node.data.id}}).length;
 
                             var count = count1 + count2;
-                            if (count > thisBlock.largestNode) {
-                                thisBlock.largestNode = count;
+                            if (count > thisBlock.highestEdgeCount) {
+                                thisBlock.highestEdgeCount = count;
                             }
-                            if (count < thisBlock.smallestNode) {
-                                thisBlock.smallestNode = count;
+                            if (count < thisBlock.lowestEdgeCount) {
+                                thisBlock.lowestEdgeCount = count;
                             }
                             node.data.weight = count;
                         });
 
-
-//                        var outDiv = $('<div></div>').attr('id', tmpID);
+                        thisBlock.edgesToShow = thisBlock.highestEdgeCount;
 
                         var cy = cytoscape({
                             container: document.getElementById(id),
@@ -424,7 +422,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         if (thisBlock.colorByDegreeToggle) {
                             var lighterColor = ColorLuminance(thisBlock.selectedNodeColor.value, -0.50);
                             var darkerColor = ColorLuminance(thisBlock.selectedNodeColor.value, 0.50);
-                            var map = 'mapData(weight, ' + thisBlock.smallestNode + ', ' + thisBlock.largestNode + ', ' + lighterColor + ', ' + darkerColor + ')';
+                            var map = 'mapData(weight, ' + thisBlock.lowestEdgeCount + ', ' + thisBlock.highestEdgeCount + ', ' + lighterColor + ', ' + darkerColor + ')';
                             console.log('updated color');
                             thisBlock.cy.style().selector('node').css('background-color', map).update();
                         }
@@ -603,7 +601,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.sizeByDegree = function (result) {
         if (result.sizeByDegreeToggle) {
-            var map = 'mapData(weight, ' + result.smallestNode + ', ' + result.largestNode + ', ' + result.minNodeSize + ', ' + result.maxNodeSize + ')';
+            var map = 'mapData(weight, ' + result.lowestEdgeCount + ', ' + result.highestEdgeCount + ', ' + result.minNodeSize + ', ' + result.maxNodeSize + ')';
             result.cy.style().selector('node').css('width', map).css('height', map).update();
         } else {
             result.cy.style().selector('node').css('width', result.defaultNodeWidth).css('height', result.defaultNodeHeight).update();

@@ -234,6 +234,7 @@ input {
 
 .cyWrapper {
     background-color: #ffffff;
+    padding: 8px;
 }
 
 .cyWrapper select, .cyWrapper button, .cyWrapper input, .cyWrapper p {
