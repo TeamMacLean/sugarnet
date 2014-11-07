@@ -126,19 +126,19 @@
 
                 <div class="form-group">
                     <label for="layout{{result.id}}">Layout</label>
-                    <select ng-model="result.selectedLayout" ng-init="form.type=result.defaultLayout" id="layout{{result.id}}" ng-options="layout.key for layout in result.layoutOptions" ng-change="changeLayout(result)">
+                    <select ng-model="result.selectedLayout" id="layout{{result.id}}" ng-options="layout as layout.key for layout in result.layoutOptions" ng-change="changeLayout(result)">
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="edgeColor{{result.id}}">Edge colour</label>
-                    <select ng-model="result.selectedEdgeColor" ng-init="form.type=result.defaultChecked" id="edgeColor{{result.id}}" ng-options="edgeColor.key for edgeColor in result.edgeColors" ng-change="changeEdgeColor(result)">
+                    <select ng-model="result.selectedEdgeColor" id="edgeColor{{result.id}}" ng-options="edgeColor as edgeColor.key for edgeColor in result.edgeColors" ng-change="changeEdgeColor(result)">
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="nodeColor{{result.id}}">Node colour</label>
-                    <select ng-model="result.selectedNodeColor" ng-init="form.type=result.defaultNodeColor" id="nodeColor{{result.id}}" ng-options="nodeColor.key for nodeColor in result.nodeColors" ng-change="changeNodeColor(result)">
+                    <select ng-model="result.selectedNodeColor" id="nodeColor{{result.id}}" ng-options="nodeColor as nodeColor.key for nodeColor in result.nodeColors" ng-change="changeNodeColor(result)">
                     </select>
                 </div>
 

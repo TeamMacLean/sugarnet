@@ -259,11 +259,14 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             {key: 'concrete', value: '#95A5A6'}
         ];
 
-        thisBlock.defaultNodeColor = thisBlock.edgeColors[1].value;
-        thisBlock.defaultEdgeColor = thisBlock.nodeColors[2].value;
-        thisBlock.defaultLayout = thisBlock.layoutOptions[3].value;
+        thisBlock.defaultNodeColor = thisBlock.edgeColors[1];
+        thisBlock.defaultEdgeColor = thisBlock.nodeColors[2];
+        thisBlock.defaultLayout = thisBlock.layoutOptions[2];
 
-        thisBlock.currentNodeColor = thisBlock.defaultNodeColor;
+
+        thisBlock.selectedNodeColor = thisBlock.defaultNodeColor;
+        thisBlock.selectedEdgeColor = thisBlock.defaultEdgeColor;
+        thisBlock.selectedLayout = thisBlock.defaultLayout;
 
         thisBlock.layout = {
             name: thisBlock.defaultLayout.value,
@@ -274,15 +277,15 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             'width': thisBlock.defaultNodeWidth,
             'height': thisBlock.defaultNodeHeight,
             'content': 'data(name)',
-            'background-color': thisBlock.defaultNodeColor
+            'background-color': thisBlock.defaultNodeColor.value
 
         };
 
         thisBlock.edgeCSS = {
             'width': '2',
             'target-arrow-shape': 'triangle',
-            'line-color': thisBlock.defaultEdgeColor,
-            'target-arrow-color': thisBlock.defaultEdgeColor
+            'line-color': thisBlock.defaultEdgeColor.value,
+            'target-arrow-color': thisBlock.defaultEdgeColor.value
         };
 
         thisBlock.questionableCSS = {
@@ -379,7 +382,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         $(window).resize(function () {
                             cy.resize();
                         });
-                        console.log($scope.resultBlocks);
                         cb(cy);
                     })
                     .error(function (data) {
@@ -415,16 +417,17 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
                 thisBlock.sizeByDegreeToggle = false;
                 thisBlock.colorByDegreeToggle = false;
-                thisBlock.selectedLayout = thisBlock.defaultLayout;
                 injectGraph(thisBlock, function (out) {
                     thisBlock.cy = out;
 
                     thisBlock.nodeColorByDegree = function () {
-                        var ligherColor = ColorLuminance(thisBlock.currentNodeColor, -0.50);
-                        var darkerColor = ColorLuminance(thisBlock.currentNodeColor, 0.50);
-                        var map = 'mapData(weight, ' + thisBlock.smallestNode + ', ' + thisBlock.largestNode + ', ' + ligherColor + ', ' + darkerColor + ')';
-                        console.log('updated color');
-                        thisBlock.cy.style().selector('node').css('background-color', map).update();
+                        if (thisBlock.colorByDegreeToggle) {
+                            var lighterColor = ColorLuminance(thisBlock.selectedNodeColor.value, -0.50);
+                            var darkerColor = ColorLuminance(thisBlock.selectedNodeColor.value, 0.50);
+                            var map = 'mapData(weight, ' + thisBlock.smallestNode + ', ' + thisBlock.largestNode + ', ' + lighterColor + ', ' + darkerColor + ')';
+                            console.log('updated color');
+                            thisBlock.cy.style().selector('node').css('background-color', map).update();
+                        }
                     };
                 });
 
@@ -588,22 +591,17 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
     $scope.changeLayout = function (result) {
         result.cy.layout({ name: result.selectedLayout.value});
-//        console.log('changeLayout', result);
     };
     $scope.changeEdgeColor = function (result) {
         result.cy.style().selector('edge').css('line-color', result.selectedEdgeColor.value).update();
         result.cy.style().selector('edge').css('target-arrow-color', result.selectedEdgeColor.value).update();
-//        console.log('changeEdgeColor', result);
     };
     $scope.changeNodeColor = function (result) {
-        result.currentNodeColor = result.selectedNodeColor.value;
         result.cy.style().selector('node').css('background-color', result.selectedNodeColor.value).update();
         result.nodeColorByDegree();
-//        console.log('changeNodeColor', result);
     };
 
     $scope.sizeByDegree = function (result) {
-        console.log(result.sizeByDegreeToggle);
         if (result.sizeByDegreeToggle) {
             var map = 'mapData(weight, ' + result.smallestNode + ', ' + result.largestNode + ', ' + result.minNodeSize + ', ' + result.maxNodeSize + ')';
             result.cy.style().selector('node').css('width', map).css('height', map).update();
@@ -613,11 +611,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
     $scope.colorByDegree = function (result) {
-        console.log(result.colorByDegreeToggle);
         if (result.colorByDegreeToggle) {
             result.nodeColorByDegree();
         } else {
-            result.cy.style().selector('node').css('background-color', result.currentNodeColor).update();
+            result.cy.style().selector('node').css('background-color', result.selectedNodeColor.value).update();
         }
     };
 
