@@ -21,9 +21,11 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.otherOptions = ['ID', 'UNUSED'];
     $scope.defineOptions = [];
     $scope.musicPlaying = false;
-
-
+    $scope.files = [];
     $scope.devMode = true;
+
+
+    $scope.resultBlocks = [];
 
     $scope.reloadDefineOptions = function () {
         $scope.defineOptions = $scope.otherOptions.concat($scope.treatments);
@@ -53,6 +55,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
     var toggleUploadLoading = function () {
+//        console.log('toggles');
         $('#upload-spinner').toggle();
     };
 
@@ -65,37 +68,38 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
         if ($scope.files.length < 1) {
             console.log('no files');
-            return;
-        }
-        //TODO limit to one file
-        angular.forEach($scope.files, function (file) {
-            fd.append('file', file)
-        });
-        toggleUploadLoading();
-        $http.post('uploadCSV', fd, {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        })
-            .success(function (d) {
-                $scope.headers = [];
-                _.forEach(d, function (item) {
-                    var head = {name: item, treatment: undefined};
-                    $scope.headers.push(head);
-                });
-                $scope.reloadDefineOptions();
-                $scope.fillOptions();
-                $('#dataExplainHelp').show();
-                toggleUploadLoading();
-            })
-            .error(function () {
-                toggleUploadLoading();
+            swal("Oops...", "No files found", "error");
+        } else {
+            //TODO limit to one file
+            angular.forEach($scope.files, function (file) {
+                fd.append('file', file)
             });
-
+            toggleUploadLoading();
+            $http.post('uploadCSV', fd, {
+                transformRequest: angular.identity,
+                headers: {'Content-Type': undefined}
+            })
+                .success(function (d) {
+                    $scope.headers = [];
+                    _.forEach(d, function (item) {
+                        var head = {name: item, treatment: undefined};
+                        $scope.headers.push(head);
+                    });
+                    $scope.reloadDefineOptions();
+                    $scope.fillOptions();
+                    $('#dataExplainHelp').show();
+                    toggleUploadLoading();
+                })
+                .error(function () {
+                    toggleUploadLoading();
+                });
+        }
     };
 
     $scope.checkCompletion = function () {
-
-        if (!_.isEmpty($scope.headers)) {
+        if (!_.isEmpty($scope.files)) {
+//            console.log($scope.headers);
+//            if (!_.isEmpty($scope.headers)) {
             var withoutTreatment = false;
             _.forEach($scope.headers, function (header) {
                 if (_.isUndefined(header.treatment)) {
@@ -108,8 +112,11 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     btn.removeClass('disabled');
                 }
             }
+//            } else {
+//                console.log('no headers loaded');
+//            }
         } else {
-            console.log('no headers loaded');
+            swal("Oops...", "No file found!", "error");
         }
     };
 
@@ -163,10 +170,12 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 headers: {'Content-Type': undefined}
             })
                 .success(function (d) {
+                    swal("Good job!", "It looks like it worked!", "success");
                     $scope.processResults(d);
                 })
                 .error(function (err) {
                     toggleResultsView();
+                    swal("Oops...", err, "error");
                     console.log('error', err);
                 });
         };
@@ -203,275 +212,185 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         return text;
     };
 
-    var injectGraph = function (network, names, cb) {
+    var injectGraph = function (thisBlock, cb) {
 
-        var tmpID = makeid();
-        var cyWrapper = $('<div></div>').addClass('cyWrapper').addClass('mb');
-        var cyHolder = $('<div></div>').appendTo(cyWrapper);
-        cyHolder.attr('id', tmpID)
+        var json = thisBlock.json;
+        var njson = thisBlock.njson;
+        var id = thisBlock.id;
+
+        thisBlock.defaultNodeWidth = 30;
+        thisBlock.defaultNodeHeight = 30;
+        thisBlock.minNodeSize = 10;
+        thisBlock.maxNodeSize = 50;
+        thisBlock.smallestNode = 99999999999;
+        thisBlock.largestNode = 0;
+
+        thisBlock.layoutOptions = [
+            {key: 'cose', value: 'cose'},
+            {key: 'grid', value: 'grid'},
+            {key: 'circle', value: 'circle'},
+            {key: 'concentric', value: 'concentric'},
+            {key: 'breadthfirst', value: 'breadthfirst'}
+        ];
+
+        thisBlock.edgeColors = [
+            {key: 'turqoise', value: '#1ABC9C'},
+            {key: 'emerald', value: '#2ECC71'},
+            {key: 'peterRiver', value: '#3498DB'},
+            {key: 'amethyst ', value: '#9B59B6'},
+            {key: 'wetAsphalt ', value: '#34495E'},
+            {key: 'sunFlower ', value: '#F1C40F'},
+            {key: 'carrot', value: '#E67E22'},
+            {key: 'alizarin', value: '#E74C3C'},
+            {key: 'clouds ', value: '#ECF0F1'},
+            {key: 'concrete ', value: '#95A5A6'}
+        ];
+
+        thisBlock.nodeColors = [
+            {key: 'turqoise', value: '#1ABC9C'},
+            {key: 'emerald', value: '#2ECC71'},
+            {key: 'peterRiver', value: '#3498DB'},
+            {key: 'amethyst', value: '#9B59B6'},
+            {key: 'wetAsphalt', value: '#34495E'},
+            {key: 'sunFlower', value: '#F1C40F'},
+            {key: 'carrot', value: '#E67E22'},
+            {key: 'alizarin', value: '#E74C3C'},
+            {key: 'clouds', value: '#ECF0F1'},
+            {key: 'concrete', value: '#95A5A6'}
+        ];
+
+        thisBlock.defaultNodeColor = thisBlock.edgeColors[1].value;
+        thisBlock.defaultEdgeColor = thisBlock.nodeColors[2].value;
+        thisBlock.defaultLayout = thisBlock.layoutOptions[3].value;
+
+        thisBlock.currentNodeColor = thisBlock.defaultNodeColor;
+
+        thisBlock.layout = {
+            name: thisBlock.defaultLayout.value,
+            padding: 10
+        };
+
+        thisBlock.nodeCSS = {
+            'width': thisBlock.defaultNodeWidth,
+            'height': thisBlock.defaultNodeHeight,
+            'content': 'data(name)',
+            'background-color': thisBlock.defaultNodeColor
+
+        };
+
+        thisBlock.edgeCSS = {
+            'width': '2',
+            'target-arrow-shape': 'triangle',
+            'line-color': thisBlock.defaultEdgeColor,
+            'target-arrow-color': thisBlock.defaultEdgeColor
+        };
+
+        thisBlock.questionableCSS = {
+            'line-style': 'dashed',
+            'target-arrow-shape': 'tee'
+        };
+
+        thisBlock.highlightedCSS = {
+            'background-color': '#ECF0F1',
+            'line-color': '#ECF0F1',
+            'target-arrow-color': '#61bffc',
+            'transition-property': 'background-color, line-color, target-arrow-color',
+            'transition-duration': '0.5s'
+        };
+
+        var nodes = [];
+        var edges = [];
+
+        $http.get(json)
+            .success(function (data) {
+                var network = data;
+                $http.get(njson)
+                    .success(function (data) {
+                        var names = data;
+                        _.forEach(network, function (ob) {
+                            var node1Int = ob.node1;
+                            var node2Int = ob.node2;
+                            var node1 = node1Int.toString();
+                            var node2 = node2Int.toString();
+                            var newID = node1 + '' + node2;
 
 
-        $('<h3>Click to load interactive graph</h3>').addClass('cyText').appendTo(cyHolder);
-        cyWrapper.appendTo('#results');
-        cyHolder.click(function () {
+                            var questionable = '';
+                            if (Math.sin(ob.pcor) < 0) {
+                                questionable = 'questionable';
+                            }
 
-            if (!cyHolder.hasClass('cy')) {
-                cyHolder.addClass('cy');
-                cyHolder.find('h3').remove();
+                            var edge = {data: {id: newID, source: node1, target: node2}, classes: questionable};
+                            edges.push(edge);
 
-                var nodes = [];
-                var edges = [];
+                            var foundNode = _.where(nodes, {data: { id: node1 }});
+                            var foundNodeTwo = _.where(nodes, {data: { id: node2 }});
 
-                _.forEach(network, function (ob) {
-                    var node1Int = ob.node1;
-                    var node2Int = ob.node2;
-                    var node1 = node1Int.toString();
-                    var node2 = node2Int.toString();
-                    var newID = node1 + '' + node2;
-
-
-//                    var sin = Math.sin(ob.pcor);
-                    var questionable = '';
-                    if (Math.sin(ob.pcor) < 0) {
-                        questionable = 'questionable';
-                    }
-
-                    var edge = {data: {id: newID, source: node1, target: node2}, classes: questionable};
-                    edges.push(edge);
-
-                    var foundNode = _.where(nodes, {data: { id: node1 }});
-                    var foundNodeTwo = _.where(nodes, {data: { id: node2 }});
-
-                    if (_.isEmpty(foundNode)) {
-                        var name = names[node1Int - 1]; //start from 0
-                        var nodeA = {data: {id: node1, name: name}};
-                        nodes.push(nodeA);
-                    }
-                    if (_.isEmpty(foundNodeTwo)) {
-                        var name = names[node2Int - 1]; //start from 0
-                        var nodeB = {data: {id: node2, name: name}};
-                        nodes.push(nodeB);
-                    }
-                });
-
-                var smallestNode = 99999999999;
-                var largestNode = 0;
+                            if (_.isEmpty(foundNode)) {
+                                var nameA = names[node1Int - 1]; //start from 0
+                                var nodeA = {data: {id: node1, name: nameA}};
+                                nodes.push(nodeA);
+                            }
+                            if (_.isEmpty(foundNodeTwo)) {
+                                var nameB = names[node2Int - 1]; //start from 0
+                                var nodeB = {data: {id: node2, name: nameB}};
+                                nodes.push(nodeB);
+                            }
+                        });
 
 //                TODO tell node about its connection count
-                _.forEach(nodes, function (node) {
-                    var count1 = _.where(edges, {data: {source: node.data.id}}).length;
-                    var count2 = _.where(edges, {data: {target: node.data.id}}).length;
+                        _.forEach(nodes, function (node) {
+                            var count1 = _.where(edges, {data: {source: node.data.id}}).length;
+                            var count2 = _.where(edges, {data: {target: node.data.id}}).length;
 
-                    var count = count1 + count2;
-                    if (count > largestNode) {
-                        largestNode = count;
-                    }
-                    if (count < smallestNode) {
-                        smallestNode = count;
-                    }
-                    node.data.weight = count;
-                });
-                var defaultNodeWidth = 30;
-                var defaultNodeHeight = 30;
-                var minNodeSize = 10;
-                var maxNodeSize = 50;
+                            var count = count1 + count2;
+                            if (count > thisBlock.largestNode) {
+                                thisBlock.largestNode = count;
+                            }
+                            if (count < thisBlock.smallestNode) {
+                                thisBlock.smallestNode = count;
+                            }
+                            node.data.weight = count;
+                        });
 
 
-                var layoutOptions = {
-                    cose: 'cose',
-//                    random: 'random',
-//                    preset: 'preset',
-                    grid: 'grid',
-                    circle: 'circle',
-                    concentric: 'concentric',
-                    breadthfirst: 'breadthfirst'
-//                    dagre: 'dagre',
-//                    cola: 'cola',
-//                    arbor: 'arbor',
-//                    springy: 'springy'
+//                        var outDiv = $('<div></div>').attr('id', tmpID);
 
-                };
+                        var cy = cytoscape({
+                            container: document.getElementById(id),
+                            style: cytoscape.stylesheet()
+                                .selector('node')
+                                .css(thisBlock.nodeCSS)
+                                .selector('edge')
+                                .css(thisBlock.edgeCSS)
+                                .selector('edge.questionable')
+                                .css(thisBlock.questionableCSS)
+                                .selector('.highlighted')
+                                .css(thisBlock.highlightedCSS),
 
-                var edgeColor = {
-                    turqoise: '#1ABC9C',
-                    emerald: '#2ECC71',
-                    peterRiver: '#3498DB',
-                    amethyst: '#9B59B6',
-                    wetAsphalt: '#34495E',
-                    sunFlower: '#F1C40F',
-                    carrot: '#E67E22',
-                    alizarin: '#E74C3C',
-                    clouds: '#ECF0F1',
-                    concrete: '#95A5A6'
-                };
-                var nodeColor = {
-                    turqoise: '#1ABC9C',
-                    emerald: '#2ECC71',
-                    peterRiver: '#3498DB',
-                    amethyst: '#9B59B6',
-                    wetAsphalt: '#34495E',
-                    sunFlower: '#F1C40F',
-                    carrot: '#E67E22',
-                    alizarin: '#E74C3C',
-                    clouds: '#ECF0F1',
-                    concrete: '#95A5A6'
-                };
+                            elements: {
+                                nodes: nodes,
+                                edges: edges
+                            },
 
-                var defaultNodeColor = edgeColor.wetAsphalt;
-                var defaultEdgeColor = nodeColor.concrete;
-                var defaultLayout = layoutOptions.cose;
+                            layout: thisBlock.layout
+                        });
 
-                var layout = {
-                    name: defaultLayout,
-                    padding: 10
-                };
-
-                var nodeCSS = {
-                    'width': defaultNodeWidth,
-                    'height': defaultNodeHeight,
-                    'content': 'data(name)',
-                    'background-color': defaultNodeColor
-
-                };
-
-                var edgeCSS = {
-                    'width': '2',
-                    'target-arrow-shape': 'triangle',
-                    'line-color': defaultEdgeColor,
-                    'target-arrow-color': defaultEdgeColor
-                };
-
-                var questionableCSS = {
-                    'line-style': 'dashed',
-                    'target-arrow-shape': 'tee'
-                };
-
-                var highlightedCSS = {
-                    'background-color': '#ECF0F1',
-                    'line-color': '#ECF0F1',
-                    'target-arrow-color': '#61bffc',
-                    'transition-property': 'background-color, line-color, target-arrow-color',
-                    'transition-duration': '0.5s'
-                };
-
-                var cy = cytoscape({
-                    container: document.getElementById(tmpID),
-
-                    style: cytoscape.stylesheet()
-                        .selector('node')
-                        .css(nodeCSS)
-                        .selector('edge')
-                        .css(edgeCSS)
-                        .selector('edge.questionable')
-                        .css(questionableCSS)
-                        .selector('.highlighted')
-                        .css(highlightedCSS),
-
-                    elements: {
-                        nodes: nodes,
-                        edges: edges
-                    },
-
-                    layout: layout
-                });
-
-
-                var layoutSelect = $('<select></select>').attr('id', '#layouts' + tmpID);
-                layoutSelect.appendTo(cyWrapper);
-                $.each(layoutOptions, function (val, text) {
-                    layoutSelect.append(
-                        $('<option></option>').val(text).html(val)
-                    );
-                });
-                layoutSelect.val(defaultLayout);
-                layoutSelect.change(function () {
-                    var newLayout = $(this).val();
-                    cy.layout({ name: newLayout });
-                });
-
-                var currentNodeColor = defaultNodeColor;
-//                var currentEdgeColor = defaultEdgeColor;
-
-//                edge color
-                var edgeColorSelect = $('<select></select>').attr('id', '#colors' + tmpID);
-                edgeColorSelect.appendTo(cyWrapper);
-                $.each(edgeColor, function (val, text) {
-                    edgeColorSelect.append(
-                        $('<option></option>').val(text).html(val)
-                    );
-                });
-                edgeColorSelect.val(defaultEdgeColor);
-                edgeColorSelect.change(function () {
-                    var newEdgeColor = $(this).val();
-                    cy.style().selector('edge').css('line-color', newEdgeColor).update();
-                    cy.style().selector('edge').css('target-arrow-color', newEdgeColor).update();
-                });
-
-//                node color
-                var nodeColorSelect = $('<select></select>').attr('id', '#colors' + tmpID);
-                nodeColorSelect.appendTo(cyWrapper);
-                $.each(nodeColor, function (val, text) {
-                    nodeColorSelect.append(
-                        $('<option></option>').val(text).html(val)
-                    );
-                });
-                nodeColorSelect.val(defaultNodeColor);
-                nodeColorSelect.change(function () {
-                    var newNodeColor = $(this).val();
-                    currentNodeColor = newNodeColor;
-                    cy.style().selector('node').css('background-color', newNodeColor).update();
-                    nodeColorByDegree();
-                });
-
-//                export png
-                $('<button>Export PNG</button>').click(function () {
-                    alert(cy.png());
-                }).appendTo(cyWrapper);
-//                export json
-                $('<button>Export JSON</button>').click(function () {
-                    alert(cy.json());
-                }).appendTo(cyWrapper);
-
-//                node size by degree
-                $('<input type="checkbox"/>').attr('id', '#nodeSizeByDegree' + tmpID).change(function () {
-                    if ($(this).is(':checked')) {
-                        var map = 'mapData(weight, ' + smallestNode + ', ' + largestNode + ', ' + minNodeSize + ', ' + maxNodeSize + ')';
-                        cy.style().selector('node').css('width', map).css('height', map).update();
-                    } else {
-//                        TODO set global default to restore to
-                        cy.style().selector('node').css('width', defaultNodeWidth).css('height', defaultNodeHeight).update();
-                    }
-                }).appendTo(cyWrapper);
-
-//                node color by degree
-                var nodeColorByDegreeCheckBox = $('<input type="checkbox"/>').attr('id', '#nodeColorByDegree' + tmpID);
-                var nodeColorByDegree = function () {
-                    if (nodeColorByDegreeCheckBox.is(':checked')) {
-
-                        var ligherColor = ColorLuminance(currentNodeColor, -0.40);
-                        var darkerColor = ColorLuminance(currentNodeColor, 0.40);
-
-                        var map = 'mapData(weight, ' + smallestNode + ', ' + largestNode + ', ' + ligherColor + ', ' + darkerColor + ')';
-                        cy.style().selector('node').css('background-color', map).update();
-                    } else {
-                        cy.style().selector('node').css('background-color', currentNodeColor).update();
-                    }
-                };
-                nodeColorByDegreeCheckBox.change(function () {
-                    nodeColorByDegree();
-                }).appendTo(cyWrapper);
-            }
-        });
-
-        cb();
-    };
-
-    var processNetwork = function (json, njson, cb) {
-        $.getJSON(json, function (network) {
-            $.getJSON(njson, function (names) {
-                injectGraph(network, names, cb);
+                        $(window).resize(function () {
+                            cy.resize();
+                        });
+                        console.log($scope.resultBlocks);
+                        cb(cy);
+                    })
+                    .error(function (data) {
+                        console.log('error', data);
+                    });
+            })
+            .error(function (data) {
+                console.log('error', data);
             });
-        });
+
+
     };
 
     $scope.processResults = function (result) {
@@ -482,45 +401,41 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             console.log('results:', result);
         }
 
+
         if (result) {
+            result.forEach(function (res) {
+                var thisBlock = {};
 
-            var currentJsonPath = '';
+                thisBlock.treatment = res[0].split('public').pop();
+                thisBlock.net = res[1].split('public').pop();
+                thisBlock.json = res[2].split('public').pop();
+                thisBlock.njson = res[3].split('public').pop();
+                thisBlock.hive = res[4].split('public').pop();
+                thisBlock.id = makeid();
 
-            async.eachSeries(result, function (res, callback) {
+                thisBlock.sizeByDegreeToggle = false;
+                thisBlock.colorByDegreeToggle = false;
+                thisBlock.selectedLayout = thisBlock.defaultLayout;
+                injectGraph(thisBlock, function (out) {
+                    thisBlock.cy = out;
 
-                if (res.indexOf("public") > -1) {
+                    thisBlock.nodeColorByDegree = function () {
+                        var ligherColor = ColorLuminance(thisBlock.currentNodeColor, -0.50);
+                        var darkerColor = ColorLuminance(thisBlock.currentNodeColor, 0.50);
+                        var map = 'mapData(weight, ' + thisBlock.smallestNode + ', ' + thisBlock.largestNode + ', ' + ligherColor + ', ' + darkerColor + ')';
+                        console.log('updated color');
+                        thisBlock.cy.style().selector('node').css('background-color', map).update();
+                    };
+                });
 
-                    var path = res.split('public').pop();
-                    var fileType = path.split('.').pop();
 
-                    if (fileType == 'jpeg') {
-                        $('<img src="' + path + '">').load(function () {
-                            $(this).addClass('img-responsive').addClass('centerImage').addClass('mb').appendTo('#results');
-                            callback();
-                        })
-                    }
-                    else if (fileType == 'json') {
-                        currentJsonPath = path;
-                        callback();
-                    }
-                    else if (fileType == 'njson') {
-                        processNetwork(currentJsonPath, path, callback);
-                    }
-                    else if (fileType == 'txt') {
-                        $('<h2><a href="' + path + '" target="_blank">Edges</a></h2>').addClass('centerText').addClass('mb').appendTo('#results');
-                        callback();
-                    } else {
-                        callback();
-                    }
-                } else {
-                    $('<h1>' + res + '</h1>').addClass('centerText').addClass('mb').appendTo('#results');
-                    callback();
-                }
-            }, function () {
+                $scope.resultBlocks.push(thisBlock);
+
                 toggleResultLoading();
             });
-        } else {
-            $('<h1>There was an error.</h1>').appendTo('#results');
+        }
+        else {
+            swal("Oops...", "No result was returned", "error");
         }
     };
 
@@ -671,6 +586,46 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         ];
         $scope.checkCompletion();
     };
-}])
-;
+    $scope.changeLayout = function (result) {
+        result.cy.layout({ name: result.selectedLayout.value});
+//        console.log('changeLayout', result);
+    };
+    $scope.changeEdgeColor = function (result) {
+        result.cy.style().selector('edge').css('line-color', result.selectedEdgeColor.value).update();
+        result.cy.style().selector('edge').css('target-arrow-color', result.selectedEdgeColor.value).update();
+//        console.log('changeEdgeColor', result);
+    };
+    $scope.changeNodeColor = function (result) {
+        result.currentNodeColor = result.selectedNodeColor.value;
+        result.cy.style().selector('node').css('background-color', result.selectedNodeColor.value).update();
+        result.nodeColorByDegree();
+//        console.log('changeNodeColor', result);
+    };
+
+    $scope.sizeByDegree = function (result) {
+        console.log(result.sizeByDegreeToggle);
+        if (result.sizeByDegreeToggle) {
+            var map = 'mapData(weight, ' + result.smallestNode + ', ' + result.largestNode + ', ' + result.minNodeSize + ', ' + result.maxNodeSize + ')';
+            result.cy.style().selector('node').css('width', map).css('height', map).update();
+        } else {
+            result.cy.style().selector('node').css('width', result.defaultNodeWidth).css('height', result.defaultNodeHeight).update();
+        }
+    };
+
+    $scope.colorByDegree = function (result) {
+        console.log(result.colorByDegreeToggle);
+        if (result.colorByDegreeToggle) {
+            result.nodeColorByDegree();
+        } else {
+            result.cy.style().selector('node').css('background-color', result.currentNodeColor).update();
+        }
+    };
+
+    $scope.cyToPng = function (result) {
+        var png = result.cy.png();
+    };
+    $scope.cyToJSON = function (result) {
+        var json = result.cy.json();
+    };
+}]);
 

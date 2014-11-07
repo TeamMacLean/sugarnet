@@ -19,6 +19,7 @@
     "angular": "~1.2.22",
     "lodash": "~2.4.1",
     "async": "~0.9.0",
-    "cytoscape": "~2.3.4"
+    "cytoscape": "~2.3.4",
+    "sweetalert": "~0.3.1"
   }
 }

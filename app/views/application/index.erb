@@ -28,7 +28,7 @@
 
     <div id="stepTwo">
         <div class="container">
-            <h1 class="alignLeft">2. Treatments</h1>
+            <h1 class="alignLeft">2. Add treatments</h1>
 
             <form ng-submit="addTreatment(header)" class="form-inline">
                 <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name">
@@ -96,12 +96,13 @@
                     </div>
                 </div>
             </div>
+
+            <button class="btn btn-danger" ng-show="devMode" ng-click="devFill()">DEV CHEAT</button>
             <button class="btn btn-default disabled" ng-click="getResults()">Submit</button>
-            <button class="btn btn-danger " ng-click="devFill()">DEV CHEAT</button>
         </div>
     </div>
 
-    <div id="results">
+    <div id="results" class="container">
         <div id="result-spinner" class="spinner">
             <h2>Processing...</h2>
 
@@ -113,10 +114,70 @@
         </div>
         <audio controls id="music">
             <source src="/music/bensound-theelevatorbossanova.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
         </audio>
-
     </div>
 
+
+    <div ng-repeat="result in resultBlocks" class="container">
+        <h2 class="treatmentTitle">{{result.treatment}}</h2>
+
+        <div class="row cyWrapper mb">
+            <div class="col-sm-3">
+
+                <div class="form-group">
+                    <label for="layout{{result.id}}">Layout</label>
+                    <select ng-model="result.selectedLayout" ng-init="form.type=result.defaultLayout" id="layout{{result.id}}" ng-options="layout.key for layout in result.layoutOptions" ng-change="changeLayout(result)">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edgeColor{{result.id}}">Edge colour</label>
+                    <select ng-model="result.selectedEdgeColor" ng-init="form.type=result.defaultChecked" id="edgeColor{{result.id}}" ng-options="edgeColor.key for edgeColor in result.edgeColors" ng-change="changeEdgeColor(result)">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nodeColor{{result.id}}">Node colour</label>
+                    <select ng-model="result.selectedNodeColor" ng-init="form.type=result.defaultNodeColor" id="nodeColor{{result.id}}" ng-options="nodeColor.key for nodeColor in result.nodeColors" ng-change="changeNodeColor(result)">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edgesToShow{{result.id}}">Edges to show</label>
+                    <input id="edgesToShow{{result.id}}" class="form-control" type="number">
+                </div>
+
+
+                <label>
+                    Node size by degree
+                    <input type="checkbox" ng-model="result.sizeByDegreeToggle" ng-change="sizeByDegree(result)">
+                </label>
+
+                <label>
+                    Node colour by degree
+                    <input type="checkbox" ng-model="result.colorByDegreeToggle" ng-change="colorByDegree(result)">
+                </label>
+
+                <button class="btn btn-default">Export PNG</button>
+                <button class="btn btn-default">Export JSON</button>
+
+            </div>
+
+            <div class="col-sm-9 cy" id="{{result.id}}">
+                <!--CYTOSCAPE-->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 mb">
+                <img ng-src="{{result.net}}" class="img-responsive"/>
+            </div>
+            <div class="col-sm-6 mb">
+                <img ng-src="{{result.hive}}" class="img-responsive"/>
+            </div>
+        </div>
+
+        <hr>
+
+    </div>
 
 </div>

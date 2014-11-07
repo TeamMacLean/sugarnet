@@ -209,8 +209,12 @@ input {
     margin-bottom: 40px;
 }
 
+.treatmentTitle {
+    font-size: 36px;
+}
+
 .cyText {
-    width: 480px;
+    max-width: 480px;
     padding-top: 20px;
     padding-bottom: 20px;
     display: block;
@@ -218,24 +222,31 @@ input {
     margin-right: auto;
     background-color: #C7F464;
     cursor: pointer;
+    text-align: center;
 }
 
 .cy {
     height: 480px;
-    width: 480px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    /*background-color: #ffffff;*/
-
+    /*padding here breaks cytoscape*/
+    padding: 0;
+    border: 1px solid #585858;
 }
 
 .cyWrapper {
-    width: 480px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
     background-color: #ffffff;
+}
+
+.cyWrapper select, .cyWrapper button, .cyWrapper input, .cyWrapper p {
+    /*display: inline;*/
+    margin-bottom: 0;
+}
+
+.cyWrapper h3 {
+    text-align: center;
+}
+
+hr {
+    border-color: #556270;
 }
 
 @-webkit-keyframes stretchdelay {

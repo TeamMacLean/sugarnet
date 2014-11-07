@@ -46,6 +46,7 @@ class ApplicationController < ActionController::Base
     require 'rinruby'
     require 'csv'
     require 'time'
+    require 'json'
 
 
     time_start = Time.now
@@ -57,6 +58,9 @@ class ApplicationController < ActionController::Base
     file = params[:file]
     headers_parsed = JSON[params[:headers]]
     treatments = JSON[params[:options]]
+
+    puts headers_parsed
+    puts treatments
 
 
     if !file || !file.tempfile || !file.tempfile.path
@@ -107,11 +111,12 @@ class ApplicationController < ActionController::Base
 
     # timestamp = '1412253936218'
 
-    myr.eval <<EOF
-    graphs <- vector()
-    union_array <- list()
+    puts 'running R code'
 
-json_array <- list()
+    myr.eval <<EOF
+    # graphs <- vector()
+output <- list()
+    union_array <- list()
 
     # path of output images
     output_folder <- 'public/graphs/'
@@ -137,43 +142,41 @@ json_array <- list()
 
     for(t in treatments){
 
+    treatment_out <- vector();
+
       # treatment name
-      graphs <- c(graphs, t)
+      treatment_out <- c(treatment_out, t)
       print(paste0("Current working on: ", t))
 
       expressions <- subset(data, treatment == t)
-
-
       mock <- make_it_like_dans(expressions)
 
       # x <- 10
       # mock <- get_diff_expressed(df, x, t)
 
       mock_nodelabels <- get_nodelabels(mock)
-
       mock_long <- make_longitudinal(mock, expressions)
 
+      nameNET <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
+      treatment_out <- c(treatment_out, nameNET)
+      jpeg(nameNET)
       y <- 250
-
-      name <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
-      graphs <- c(graphs, name)
-      jpeg(name)
       mock_edges <- make_net(mock_long, y)
       graphics.off()
 
       # THIS IS A DIRTY LITTLE HACK
       # mock_edges <- na.omit(mock_edges)
 
-library("jsonlite")
-myjson <- toJSON(mock_edges)
-name <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
-graphs <- c(graphs, name)
-cat(myjson, file=name)
+      library("jsonlite")
+      myjson <- toJSON(mock_edges)
+      nameJSON <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
+      treatment_out <- c(treatment_out, nameJSON)
+      cat(myjson, file=nameJSON)
 
-myjson <- toJSON(mock_nodelabels)
-name <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
-graphs <- c(graphs, name)
-cat(myjson, file=name)
+      myjson <- toJSON(mock_nodelabels)
+      nameNJSON <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
+      treatment_out <- c(treatment_out, nameNJSON)
+      cat(myjson, file=nameNJSON)
 
 
       mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
@@ -181,55 +184,62 @@ cat(myjson, file=name)
       # union_array <- c(union_array, mock_igr)
       union_array[[length(union_array)+1]] <- mock_igr
 
-  # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
-  # graphs <- c(graphs, name)
-  # jpeg(name)
-  # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-  # graphics.off()
+      # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
+      # treatment_out <- c(treatment_out, name)
+      # jpeg(name)
+      # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+      # graphics.off()
 
-  # SAME AS ABOVE BUT AUTO AND BLUE
-  # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
-  # graphs <- c(graphs, name)
-  # jpeg(name)
-  # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
-  # graphics.off()
+      # SAME AS ABOVE BUT AUTO AND BLUE
+      # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
+      # treatment_out <- c(treatment_out, name)
+      # jpeg(name)
+      # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
+      # graphics.off()
 
 
       library("HiveR")
       mock_hive <- make_annotated_hive(mock_igr)
       library(plyr)
       name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
-      graphs <- c(graphs, name)
+      treatment_out <- c(treatment_out, name)
       jpeg(name)
       plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
       graphics.off()
 
 
       # TABLE OUTPUT
-      name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
-      graphs <- c(graphs, name)
-      make_net
-      write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
+      # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
+      # treatment_out <- c(treatment_out, name)
+      # make_net
+      # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
 
+      output[[length(output)+1]] <- treatment_out
 
 
     }
 
-  graphs <- c(graphs, 'combined')
-  union <- graph.union(union_array)
-  name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
-  graphs <- c(graphs, name)
-  jpeg(name)
-  plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
-  graphics.off()
+  # TEMP TURNED OFF
+  # treatment_out <- c(treatment_out, 'combined')
+  # union <- graph.union(union_array)
+  # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
+  # treatment_out <- c(treatment_out, name)
+  # jpeg(name)
+  # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+  # graphics.off()
+
+jsonOutput <- as.character(toJSON(output))
+
 
 
 EOF
 
+    puts 'finished R code'
+
     File.delete(tmpCSV) if File.exist?(tmpCSV)
 
-    graphs = myr.pull('as.vector(graphs)')
-
+    # graphs = myr.pull('as.vector(graphs)')
+    graphs = myr.pull('jsonOutput')
     myr.quit
 
     time_end = Time.now
