@@ -647,7 +647,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.cyToPng = function (result) {
         var png = result.cy.png();
         var byteString = png.split(',')[1];
-
         var binary = atob(byteString);
         var len = binary.length;
         var buffer = new ArrayBuffer(len);
@@ -660,7 +659,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
     $scope.cyToJSON = function (result) {
         var json = result.cy.json();
-        var string = JSON.stringify(json);
+        var string = JSON.stringify(json, null, '\t');
         var blob = new Blob([string], {type: "application/json"});
         saveAs(blob, 'graph-' + result.id + '.json');
     };
