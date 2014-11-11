@@ -394,6 +394,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
         //result should already be parsed json (angular does it by its self)
 
+        if (result.length < 1) {
+            swal("Oops...", 'No results received', "error");
+        }
+
         if ($scope.devMode) {
             console.log('results:', result);
         }
@@ -658,7 +662,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         saveAs(file, 'graph-' + result.id + '.png');
     };
     $scope.cyToJSON = function (result) {
-        var json = result.cy.json();
+
+        var out = {edges: result.edges, nodes: result.nodes};
+        var json = JSON.stringify(out);
+//        var json = result.cy.json();
         var string = JSON.stringify(json, null, '\t');
         var blob = new Blob([string], {type: "application/json"});
         saveAs(blob, 'graph-' + result.id + '.json');
