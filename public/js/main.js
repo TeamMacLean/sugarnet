@@ -25,6 +25,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.files = [];
     $scope.devMode = true;
     $scope.resultBlocks = [];
+    $scope.ResultBlocksOriginal = [];
 
     $scope.reloadDefineOptions = function () {
         $scope.defineOptions = $scope.otherOptions.concat($scope.treatments);
@@ -297,8 +298,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             'transition-duration': '0.5s'
         };
 
-        var nodes = [];
-        var edges = [];
+        thisBlock.nodes = [];
+        thisBlock.edges = [];
 
         $http.get(json)
             .success(function (data) {
@@ -308,8 +309,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         var names = data;
 
                         _.forEach(network, function (ob) {
-
-                            console.log(ob);
 
                             var node1Int = ob.node1;
                             var node2Int = ob.node2;
@@ -323,27 +322,27 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                             }
 
                             var edge = {data: {id: newID, source: node1, target: node2}, classes: questionable};
-                            edges.push(edge);
+                            thisBlock.edges.push(edge);
 
-                            var foundNode = _.where(nodes, {data: { id: node1 }});
-                            var foundNodeTwo = _.where(nodes, {data: { id: node2 }});
+                            var foundNode = _.where(thisBlock.nodes, {data: { id: node1 }});
+                            var foundNodeTwo = _.where(thisBlock.nodes, {data: { id: node2 }});
 
                             if (_.isEmpty(foundNode)) {
                                 var nameA = names[node1Int - 1]; //start from 0
                                 var nodeA = {data: {id: node1, name: nameA}};
-                                nodes.push(nodeA);
+                                thisBlock.nodes.push(nodeA);
                             }
                             if (_.isEmpty(foundNodeTwo)) {
                                 var nameB = names[node2Int - 1]; //start from 0
                                 var nodeB = {data: {id: node2, name: nameB}};
-                                nodes.push(nodeB);
+                                thisBlock.nodes.push(nodeB);
                             }
                         });
 
 //                TODO tell node about its connection count
-                        _.forEach(nodes, function (node) {
-                            var count1 = _.where(edges, {data: {source: node.data.id}}).length;
-                            var count2 = _.where(edges, {data: {target: node.data.id}}).length;
+                        _.forEach(thisBlock.nodes, function (node) {
+                            var count1 = _.where(thisBlock.edges, {data: {source: node.data.id}}).length;
+                            var count2 = _.where(thisBlock.edges, {data: {target: node.data.id}}).length;
 
                             var count = count1 + count2;
                             if (count > thisBlock.highestEdgeCount) {
@@ -370,8 +369,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                                 .css(thisBlock.highlightedCSS),
 
                             elements: {
-                                nodes: nodes,
-                                edges: edges
+                                nodes: thisBlock.nodes,
+                                edges: thisBlock.edges
                             },
 
                             layout: thisBlock.layout
@@ -418,6 +417,19 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 injectGraph(thisBlock, function (out) {
                     thisBlock.cy = out;
 
+
+                    function compare(a, b) {
+                        if (a.data.weight < b.data.weight) {
+                            return 1;
+                        }
+                        if (a.data.weight > b.data.weight) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+
+                    thisBlock.nodes.sort(compare);
+
                     thisBlock.nodeColorByDegree = function () {
                         if (thisBlock.colorByDegreeToggle) {
                             var lighterColor = ColorLuminance(thisBlock.selectedNodeColor.value, -0.50);
@@ -428,12 +440,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                         }
                     };
                 });
-
-
                 $scope.resultBlocks.push(thisBlock);
-
-                toggleResultLoading();
             });
+            toggleResultLoading();
         }
         else {
             swal("Oops...", "No result was returned", "error");
@@ -606,6 +615,18 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         } else {
             result.cy.style().selector('node').css('width', result.defaultNodeWidth).css('height', result.defaultNodeHeight).update();
         }
+    };
+
+    $scope.edgesToShow = function (result) {
+
+        var citrus = result.nodes.slice(0, result.edgesToShow);
+
+        result.cy.load({
+            nodes: citrus,
+
+            edges: result.edges
+        });
+
     };
 
     $scope.colorByDegree = function (result) {
