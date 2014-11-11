@@ -144,7 +144,7 @@
 
                 <div class="form-group">
                     <label for="edgesToShow{{result.id}}">Stop top X nodes by degree</label>
-                    <input ng-model="result.edgesToShow" id="edgesToShow{{result.id}}" class="form-control" type="number" ng-change="edgesToShow(result)">
+                    <input ng-model="result.edgesToShow" id="edgesToShow{{result.id}}" class="form-control" type="number" ng-change="edgesToShow(result)" min="0" max="{{result.nodes.length}}">
                 </div>
 
 
@@ -158,8 +158,13 @@
                     <input type="checkbox" ng-model="result.colorByDegreeToggle" ng-change="colorByDegree(result)">
                 </label>
 
-                <button class="btn btn-default">Export PNG</button>
-                <button class="btn btn-default">Export JSON</button>
+                <label>
+                    Node edge count
+                    <input type="checkbox" ng-model="result.showEdgeCount" ng-change="toggleEdgeCount(result)">
+                </label>
+
+                <button class="btn btn-default" ng-click="cyToPng(result)">Export PNG</button>
+                <button class="btn btn-default" ng-click="cyToJSON(result)">Export JSON</button>
 
             </div>
 

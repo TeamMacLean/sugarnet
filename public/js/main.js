@@ -354,8 +354,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                             node.data.weight = count;
                         });
 
-                        thisBlock.edgesToShow = thisBlock.highestEdgeCount;
-
                         var cy = cytoscape({
                             container: document.getElementById(id),
                             style: cytoscape.stylesheet()
@@ -411,6 +409,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 thisBlock.njson = res[3].split('public').pop();
                 thisBlock.hive = res[4].split('public').pop();
                 thisBlock.id = makeid();
+                thisBlock.showEdgeCount = false;
 
                 thisBlock.sizeByDegreeToggle = false;
                 thisBlock.colorByDegreeToggle = false;
@@ -429,6 +428,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     }
 
                     thisBlock.nodes.sort(compare);
+
+
+                    thisBlock.edgesToShow = thisBlock.nodes.length;
 
                     thisBlock.nodeColorByDegree = function () {
                         if (thisBlock.colorByDegreeToggle) {
@@ -618,15 +620,19 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
     $scope.edgesToShow = function (result) {
-
         var citrus = result.nodes.slice(0, result.edgesToShow);
-
         result.cy.load({
             nodes: citrus,
-
             edges: result.edges
         });
+    };
 
+    $scope.toggleEdgeCount = function (result) {
+        if (result.showEdgeCount) {
+            result.cy.style().selector('node').css('content', 'data(weight)').update()
+        } else {
+            result.cy.style().selector('node').css('content', 'data(name)').update()
+        }
     };
 
     $scope.colorByDegree = function (result) {
@@ -637,11 +643,27 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
+
     $scope.cyToPng = function (result) {
         var png = result.cy.png();
+        var byteString = png.split(',')[1];
+
+        var binary = atob(byteString);
+        var len = binary.length;
+        var buffer = new ArrayBuffer(len);
+        var view = new Uint8Array(buffer);
+        for (var i = 0; i < len; i++) {
+            view[i] = binary.charCodeAt(i);
+        }
+        var file = new Blob([ view.buffer ]);
+        saveAs(file, 'graph-' + result.id + '.png');
     };
     $scope.cyToJSON = function (result) {
         var json = result.cy.json();
+        var string = JSON.stringify(json);
+        var blob = new Blob([string], {type: "application/json"});
+        saveAs(blob, 'graph-' + result.id + '.json');
     };
+
 }]);
 
