@@ -26,6 +26,18 @@ class ApplicationController < ActionController::Base
     render :json => @headers
   end
 
+  def help
+    render
+  end
+
+  def examples
+    render
+  end
+
+  def testdata
+    render
+  end
+
   def index
     render
   end

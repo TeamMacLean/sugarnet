@@ -7,4 +7,8 @@ Rails.application.routes.draw do
   post '/uploadCSV' => 'application#upload_csv'
   post '/getResults' => 'application#get_results'
 
+  get '/help' => 'application#help'
+  get '/examples' => 'application#examples'
+  get '/testdata' => 'application#testdata'
+
 end

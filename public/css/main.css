@@ -22,6 +22,7 @@ body {
     font-size: 5em;
     font-weight: 700;
     margin: 0;
+    text-align: center;
 }
 
 #logo h3 {
@@ -32,6 +33,12 @@ body {
 
 #logo p {
     text-align: left;
+}
+
+.img-responsive {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 h1, h2, h3, h4 {
@@ -62,8 +69,8 @@ h1, h2, h3, h4 {
 
 #footer {
     padding: 20px;
-    color: #fff;
-    /*text-align: center;*/
+    color: #ECF0F1;
+    text-align: center;
 }
 
 #footer a {
@@ -120,7 +127,7 @@ input[type="text"] {
     user-select: none;
     border-radius: 4px;
     color: #333;
-    background: #fff none;
+    background: #ECF0F1 none;
     border: 1px solid #ccc;
 }
 
@@ -212,6 +219,8 @@ input {
 
 .treatmentTitle {
     font-size: 36px;
+    color: #556270;
+    font-weight: bold;
 }
 
 .cyText {
@@ -230,11 +239,11 @@ input {
     height: 480px;
     /*padding here breaks cytoscape*/
     padding: 0;
-    border: 1px solid #585858;
+    border: 1px solid #BDC3C7;
 }
 
 .cyWrapper {
-    background-color: #ffffff;
+    background-color: #ECF0F1;
     padding: 8px;
 }
 
@@ -245,6 +254,10 @@ input {
 
 .cyWrapper h3 {
     text-align: center;
+}
+
+.blockme {
+    display: block;
 }
 
 hr {
