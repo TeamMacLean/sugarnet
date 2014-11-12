@@ -673,11 +673,11 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
 
 //    this is just for fun
+    var animateString = 'rubberBand';
     $('#logo').find('img').hover(function () {
-        $(this).addClass('animated bounce');
-        $(this).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-            $(this).removeClass('animated bounce');
-        });
+        $(this).addClass('animated ' + animateString);
+    }).bind("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function () {
+        $(this).removeClass('animated ' + animateString);
     });
 
 }]);

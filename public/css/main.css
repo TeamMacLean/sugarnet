@@ -35,6 +35,11 @@ body {
     text-align: left;
 }
 
+#logo img {
+    width: 64px;
+    height: 64px;
+}
+
 .img-responsive {
     display: block;
     margin-right: auto;
