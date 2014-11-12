@@ -3,9 +3,9 @@
 
 ### Depends on    
 [bower](http://bower.io)    
-[bundler.io](http://bundler.io)
-[rails](http://rubyonrails.org)
-[R](http://r-project.org)
+[bundler.io](http://bundler.io)    
+[rails](http://rubyonrails.org)    
+[R](http://r-project.org)    
 
 ### Install
 ```
