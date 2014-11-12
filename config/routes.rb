@@ -9,6 +9,5 @@ Rails.application.routes.draw do
 
   get '/help' => 'application#help'
   get '/examples' => 'application#examples'
-  get '/testdata' => 'application#testdata'
 
 end

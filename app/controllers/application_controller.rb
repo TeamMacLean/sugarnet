@@ -34,10 +34,6 @@ class ApplicationController < ActionController::Base
     render
   end
 
-  def testdata
-    render
-  end
-
   def index
     render
   end

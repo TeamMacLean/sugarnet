@@ -671,5 +671,14 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         saveAs(blob, 'graph-' + result.id + '.json');
     };
 
+
+//    this is just for fun
+    $('#logo').find('img').hover(function () {
+        $(this).addClass('animated bounce');
+        $(this).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+            $(this).removeClass('animated bounce');
+        });
+    });
+
 }]);
 

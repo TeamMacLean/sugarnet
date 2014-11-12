@@ -21,6 +21,7 @@
     "async": "~0.9.0",
     "cytoscape": "~2.3.4",
     "sweetalert": "~0.3.1",
-    "FileSaver": "*"
+    "FileSaver": "*",
+    "animate.css": "~3.2.0"
   }
 }
