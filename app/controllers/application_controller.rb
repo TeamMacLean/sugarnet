@@ -78,11 +78,11 @@ class ApplicationController < ActionController::Base
 
     timestamp = DateTime.now.strftime('%Q')
 
-    tmpCSV = "public/tmp/tmp-#{timestamp}.csv"
+    tmp_csv = "public/tmp/tmp-#{timestamp}.csv"
 
-    puts tmpCSV
+    puts tmp_csv
 
-    CSV.open(tmpCSV, 'wb') do |csv|
+    CSV.open(tmp_csv, 'wb') do |csv|
       csv << %w(expression experiment gene treatment time rep)
 
       treatments.each do |option|
@@ -102,7 +102,6 @@ class ApplicationController < ActionController::Base
             col_index = headers_parsed.index(header)
 
             puts "processing col #{col_index}..."
-            # example = 42187 long
             CSV.foreach(file.tempfile.path, :headers => true) { |row|
               expression = row[col_index]
               experiment = header['name']
@@ -122,129 +121,120 @@ class ApplicationController < ActionController::Base
     puts 'running R code'
 
     myr.eval <<EOF
-    # graphs <- vector()
+
+# graphs <- vector()
 output <- list()
-    union_array <- list()
+union_array <- list()
 
-    # path of output images
-    output_folder <- 'public/graphs/'
+# path of output images
+output_folder <- 'public/graphs/'
 
-    source('gene_nets/functions.R')
-    load_libraries()
+source('gene_nets/functions.R')
+load_libraries()
 
-    # read input
-    raw_filename = "public/tmp/tmp-#{timestamp}.csv"
-    data <- read.csv(raw_filename, header = TRUE)
+# read input
+raw_filename = "public/tmp/tmp-#{timestamp}.csv"
+data <- read.csv(raw_filename, header = TRUE)
 
-    # clean up dataset
-    data[data == 0] <- NA
-
-
-    # get list of treatments
-    treatments <- unique(data$treatment)
-
-    # create empty lists
-    # mock_array <- list()
-
-    euler_array <- list()
-
-    for(t in treatments){
-
-    treatment_out <- vector();
-
-      # treatment name
-      treatment_out <- c(treatment_out, t)
-      print(paste0("Current working on: ", t))
-
-      expressions <- subset(data, treatment == t)
-      mock <- make_it_like_dans(expressions)
-
-      # x <- 10
-      # mock <- get_diff_expressed(df, x, t)
-
-      mock_nodelabels <- get_nodelabels(mock)
-      mock_long <- make_longitudinal(mock, expressions)
-
-      nameNET <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
-      treatment_out <- c(treatment_out, nameNET)
-      jpeg(nameNET)
-      y <- 250
-      mock_edges <- make_net(mock_long, y)
-      graphics.off()
-
-      # THIS IS A DIRTY LITTLE HACK
-      # mock_edges <- na.omit(mock_edges)
-
-      library("jsonlite")
-      myjson <- toJSON(mock_edges)
-      nameJSON <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
-      treatment_out <- c(treatment_out, nameJSON)
-      cat(myjson, file=nameJSON)
-
-      myjson <- toJSON(mock_nodelabels)
-      nameNJSON <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
-      treatment_out <- c(treatment_out, nameNJSON)
-      cat(myjson, file=nameNJSON)
+# clean up dataset
+data[data == 0] <- NA
 
 
-      mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
+# get list of treatments
+treatments <- unique(data$treatment)
 
-      # union_array <- c(union_array, mock_igr)
-      union_array[[length(union_array)+1]] <- mock_igr
+# create empty lists
+# mock_array <- list()
 
-      # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
-      # treatment_out <- c(treatment_out, name)
-      # jpeg(name)
-      # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-      # graphics.off()
+euler_array <- list()
 
-      # SAME AS ABOVE BUT AUTO AND BLUE
-      # name <- paste0(output_folder,paste0(t,'-igr-auto-#{timestamp}.jpeg'))
-      # treatment_out <- c(treatment_out, name)
-      # jpeg(name)
-      # plot(mock_igr, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "blue")
-      # graphics.off()
+for(t in treatments){
+
+  treatment_out <- vector();
+
+  # treatment name
+  treatment_out <- c(treatment_out, t)
+  print(paste0("Current working on: ", t))
+
+  expressions <- subset(data, treatment == t)
+  mock <- make_it_like_dans(expressions)
+
+  # x <- 10
+  # mock <- get_diff_expressed(df, x, t)
+
+  mock_nodelabels <- get_nodelabels(mock)
+  mock_long <- make_longitudinal(mock, expressions)
+
+  nameNET <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
+  treatment_out <- c(treatment_out, nameNET)
+  jpeg(nameNET)
+  y <- 250
+  mock_edges <- make_net(mock_long, y)
+  graphics.off()
+
+  # THIS IS A DIRTY LITTLE HACK
+  # mock_edges <- na.omit(mock_edges)
+
+  library("jsonlite")
+  myjson <- toJSON(mock_edges)
+  nameJSON <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
+  treatment_out <- c(treatment_out, nameJSON)
+  cat(myjson, file=nameJSON)
+
+  myjson <- toJSON(mock_nodelabels)
+  nameNJSON <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
+  treatment_out <- c(treatment_out, nameNJSON)
+  cat(myjson, file=nameNJSON)
 
 
-      library("HiveR")
-      mock_hive <- make_annotated_hive(mock_igr)
-      library(plyr)
-      name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
-      treatment_out <- c(treatment_out, name)
-      jpeg(name)
-      plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-      graphics.off()
+  mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
 
+  # union_array <- c(union_array, mock_igr)
+  union_array[[length(union_array)+1]] <- mock_igr
 
-      # TABLE OUTPUT
-      # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
-      # treatment_out <- c(treatment_out, name)
-      # make_net
-      # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
-
-      output[[length(output)+1]] <- treatment_out
-
-
-    }
-
-  # TEMP TURNED OFF
-  # treatment_out <- c(treatment_out, 'combined')
-  # union <- graph.union(union_array)
-  # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
+  # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
   # treatment_out <- c(treatment_out, name)
   # jpeg(name)
-  # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+  # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
   # graphics.off()
 
+  library("HiveR")
+  mock_hive <- make_annotated_hive(mock_igr)
+  library(plyr)
+  name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
+  treatment_out <- c(treatment_out, name)
+  jpeg(name)
+  plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+  graphics.off()
+
+
+  # TABLE OUTPUT
+  # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
+  # treatment_out <- c(treatment_out, name)
+  # make_net
+  # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
+
+  output[[length(output)+1]] <- treatment_out
+
+
+}
+
+# TEMP TURNED OFF
+# treatment_out <- c(treatment_out, 'combined')
+# union <- graph.union(union_array)
+# name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
+# treatment_out <- c(treatment_out, name)
+# jpeg(name)
+# plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+# graphics.off()
+
 jsonOutput <- as.character(toJSON(output))
-
-
 
 EOF
 
     puts 'finished R code'
 
-    File.delete(tmpCSV) if File.exist?(tmpCSV)
+    File.delete(tmp_csv) if File.exist?(tmp_csv)
 
     # graphs = myr.pull('as.vector(graphs)')
     graphs = myr.pull('jsonOutput')
