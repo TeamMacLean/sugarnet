@@ -1,6 +1,11 @@
+/**
+ *
+ * @type {module|*}
+ */
 var app = angular.module('rotool', []);
 
 // Just pretend this is not here, ok?
+
 app.directive('fileInput', ['$parse', function ($parse) {
     return {
         restrict: 'A',
@@ -31,11 +36,19 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         $scope.defineOptions = $scope.otherOptions.concat($scope.treatments);
     };
 
+    /**
+     *
+     * @param elm
+     */
     $scope.filesChanged = function (elm) {
         $scope.files = elm.files;
         $scope.$apply();
     };
 
+    /**
+     *
+     * @param header
+     */
     $scope.addTreatment = function (header) {
         if (!_.contains($scope.treatments, header) && !_.isEmpty(header)) {
             $scope.header = '';
@@ -45,6 +58,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
+    /**
+     *
+     * @param treatment
+     */
     $scope.removeTreatment = function (treatment) {
         if (_.contains($scope.treatments, treatment)) {
             _.pull($scope.treatments, treatment);
@@ -136,6 +153,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.getResults = function () {
 
+        /**
+         *
+         * @param headers
+         */
         var postIt = function (headers) {
 
             toggleResultsView();
@@ -177,7 +198,11 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
     /**
-     * @return {string}
+     *
+     * @param hex
+     * @param lum
+     * @returns {string}
+     * @constructor
      */
     var ColorLuminance = function (hex, lum) {
 
@@ -199,6 +224,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         return rgb;
     };
 
+    /**
+     *
+     * @returns {string}
+     */
     var makeid = function () {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -209,6 +238,11 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         return text;
     };
 
+    /**
+     *
+     * @param thisBlock
+     * @param cb
+     */
     var injectGraph = function (thisBlock, cb) {
 
         var json = thisBlock.json;
@@ -354,6 +388,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                             node.data.weight = count;
                         });
 
+
                         var cy = cytoscape({
                             container: document.getElementById(id),
                             style: cytoscape.stylesheet()
@@ -386,10 +421,12 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             .error(function (data) {
                 console.log('error', data);
             });
-
-
     };
 
+    /**
+     *
+     * @param result
+     */
     $scope.processResults = function (result) {
 
         //result should already be parsed json (angular does it by its self)
@@ -432,9 +469,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     }
 
                     thisBlock.nodes.sort(compare);
-
-
-                    thisBlock.edgesToShow = thisBlock.nodes.length;
+                    thisBlock.topNodes = thisBlock.nodes.length;
+                    thisBlock.nodeCount = thisBlock.topNodes;
 
                     thisBlock.nodeColorByDegree = function () {
                         if (thisBlock.colorByDegreeToggle) {
@@ -455,6 +491,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
+
     $scope.fillOptions = function () {
         _.forEach($scope.headers, function (head) {
             head.treatment = $scope.defineOptions[1];
@@ -463,6 +500,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     };
 
 //TODO get rid of this ASAP
+
     $scope.devFill = function () {
         $scope.treatments = ['MOCK', 'AVR', 'VIR'];
         $scope.reloadDefineOptions();
@@ -602,18 +640,37 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         ];
         $scope.checkCompletion();
     };
+
+    /**
+     *
+     * @param result
+     */
     $scope.changeLayout = function (result) {
         result.cy.layout({ name: result.selectedLayout.value});
     };
+
+    /**
+     *
+     * @param result
+     */
     $scope.changeEdgeColor = function (result) {
         result.cy.style().selector('edge').css('line-color', result.selectedEdgeColor.value).update();
         result.cy.style().selector('edge').css('target-arrow-color', result.selectedEdgeColor.value).update();
     };
+
+    /**
+     *
+     * @param result
+     */
     $scope.changeNodeColor = function (result) {
         result.cy.style().selector('node').css('background-color', result.selectedNodeColor.value).update();
         result.nodeColorByDegree();
     };
 
+    /**
+     *
+     * @param result
+     */
     $scope.sizeByDegree = function (result) {
         if (result.sizeByDegreeToggle) {
             var map = 'mapData(weight, ' + result.lowestEdgeCount + ', ' + result.highestEdgeCount + ', ' + result.minNodeSize + ', ' + result.maxNodeSize + ')';
@@ -623,14 +680,31 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
-    $scope.edgesToShow = function (result) {
-        var citrus = result.nodes.slice(0, result.edgesToShow);
+    /**
+     *
+     * @param result
+     */
+    $scope.topNodes = function (result) {
+        var citrus = result.nodes.slice(0, result.topNodes);
         result.cy.load({
             nodes: citrus,
             edges: result.edges
         });
     };
 
+    /**
+     *
+     * @param result
+     */
+    $scope.edgesToShow = function (result) {
+        console.log(result);
+        swal("I SAID NOT TO USE IT!", "", "warning");
+    };
+
+    /**
+     *
+     * @param result
+     */
     $scope.toggleEdgeCount = function (result) {
         if (result.showEdgeCount) {
             result.cy.style().selector('node').css('content', 'data(weight)').update()
@@ -639,6 +713,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
+    /**
+     *
+     * @param result
+     */
     $scope.colorByDegree = function (result) {
         if (result.colorByDegreeToggle) {
             result.nodeColorByDegree();
@@ -647,7 +725,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
-
+    /**
+     *
+     * @param result
+     */
     $scope.cyToPng = function (result) {
         var png = result.cy.png();
         var byteString = png.split(',')[1];
@@ -661,11 +742,14 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         var file = new Blob([ view.buffer ]);
         saveAs(file, 'graph-' + result.id + '.png');
     };
-    $scope.cyToJSON = function (result) {
 
+    /**
+     *
+     * @param result
+     */
+    $scope.cyToJSON = function (result) {
         var out = {edges: result.edges, nodes: result.nodes};
         var json = JSON.stringify(out);
-//        var json = result.cy.json();
         var string = JSON.stringify(json, null, '\t');
         var blob = new Blob([string], {type: "application/json"});
         saveAs(blob, 'graph-' + result.id + '.json');

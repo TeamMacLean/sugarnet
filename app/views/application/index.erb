@@ -143,8 +143,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edgesToShow{{result.id}}">Stop top X nodes by degree</label>
-                    <input ng-model="result.edgesToShow" id="edgesToShow{{result.id}}" class="form-control" type="number" ng-change="edgesToShow(result)" min="0" max="{{result.nodes.length}}">
+                    <label for="topNodes{{result.id}}">Show top X nodes by degree</label>
+                    <input ng-model="result.topNodes" id="topNodes{{result.id}}" class="form-control" type="number" ng-change="topNodes(result)" min="0" max="{{result.nodeCount}}">
+                </div>
+
+                <div class="form-group">
+                    <label for="edgesToShow{{result.id}}">DO NOT USE</label>
+                    <input ng-model="result.edgesToShow" id="edgesToShow{{result.id}}" class="form-control" type="number" ng-change="edgesToShow(result)" min="0">
                 </div>
 
 
