@@ -265,6 +265,12 @@ input {
     display: block;
 }
 
+#musicPlayer {
+    display: block;
+    text-align: center;
+
+}
+
 hr {
     border-color: #556270;
 }

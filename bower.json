@@ -22,6 +22,7 @@
     "cytoscape": "~2.3.4",
     "sweetalert": "~0.3.1",
     "FileSaver": "*",
-    "animate.css": "~3.2.0"
+    "animate.css": "~3.2.0",
+    "fontawesome": "~4.2.0"
   }
 }

@@ -29,6 +29,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.musicPlaying = false;
     $scope.files = [];
     $scope.devMode = true;
+    $scope.musicOn = true;
     $scope.resultBlocks = [];
     $scope.ResultBlocksOriginal = [];
 
@@ -77,6 +78,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     var toggleResultLoading = function () {
         $('#result-spinner').toggle();
+        $('#musicPlayer').hide();
+        toggleMusic();
     };
 
     $scope.upload = function () {
@@ -131,9 +134,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
-    var toggleResultsView = function () {
-
-        if (!$scope.devMode) {
+    var toggleMusic = function () {
+        if ($scope.musicOn) {
             if ($scope.musicPlaying) {
                 $('#music').trigger("pause");
                 $scope.musicPlaying = false;
@@ -142,13 +144,14 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 $scope.musicPlaying = true;
             }
         }
+    };
 
-        //TODO make this lest specific
-        $('#stepOne').toggle();
-        $('#stepTwo').toggle();
-        $('#stepThree').toggle();
-        $('#results').toggle();
-
+    var toggleResultsView = function () {
+        toggleMusic();
+        $('#stepOne').hide();
+        $('#stepTwo').hide();
+        $('#stepThree').hide();
+        $('#results').show();
     };
 
     $scope.getResults = function () {
@@ -763,6 +766,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     }).bind("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function () {
         $(this).removeClass('animated ' + animateString);
     });
+
+    $('#musicPlayer').click(function () {
+        var player = $('#musicPlayer');
+        player.toggleClass('fa-pause');
+        player.toggleClass('fa-play');
+        toggleMusic();
+    })
 
 }]);
 
