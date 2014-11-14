@@ -56,7 +56,6 @@ class ApplicationController < ActionController::Base
     require 'time'
     require 'json'
 
-
     time_start = Time.now
 
     myr = RinRuby.new(:echo => R_ECHO)
@@ -122,113 +121,110 @@ class ApplicationController < ActionController::Base
 
     myr.eval <<EOF
 
-# graphs <- vector()
-output <- list()
-union_array <- list()
+      # graphs <- vector()
+      output <- list()
+      union_array <- list()
 
-# path of output images
-output_folder <- 'public/graphs/'
+      # path of output images
+      output_folder <- 'public/graphs/'
 
-source('gene_nets/functions.R')
-load_libraries()
+      source('gene_nets/functions.R')
+      load_libraries()
 
-# read input
-raw_filename = "public/tmp/tmp-#{timestamp}.csv"
-data <- read.csv(raw_filename, header = TRUE)
+      # read input
+      raw_filename = "public/tmp/tmp-#{timestamp}.csv"
+      data <- read.csv(raw_filename, header = TRUE)
 
-# clean up dataset
-data[data == 0] <- NA
+      # clean up dataset
+      data[data == 0] <- NA
 
+      # get list of treatments
+      treatments <- unique(data$treatment)
 
-# get list of treatments
-treatments <- unique(data$treatment)
+      # create empty lists
+      # mock_array <- list()
 
-# create empty lists
-# mock_array <- list()
+      euler_array <- list()
 
-euler_array <- list()
+      for(t in treatments){
 
-for(t in treatments){
+        treatment_out <- vector();
 
-  treatment_out <- vector();
+        # treatment name
+        treatment_out <- c(treatment_out, t)
+        print(paste0("Current working on: ", t))
 
-  # treatment name
-  treatment_out <- c(treatment_out, t)
-  print(paste0("Current working on: ", t))
+        expressions <- subset(data, treatment == t)
+        mock <- make_it_like_dans(expressions)
 
-  expressions <- subset(data, treatment == t)
-  mock <- make_it_like_dans(expressions)
+        # x <- 10
+        # mock <- get_diff_expressed(df, x, t)
 
-  # x <- 10
-  # mock <- get_diff_expressed(df, x, t)
+        mock_nodelabels <- get_nodelabels(mock)
+        mock_long <- make_longitudinal(mock, expressions)
 
-  mock_nodelabels <- get_nodelabels(mock)
-  mock_long <- make_longitudinal(mock, expressions)
+        nameNET <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
+        treatment_out <- c(treatment_out, nameNET)
+        jpeg(nameNET)
+        y <- 250
+        mock_edges <- make_net(mock_long, y)
+        graphics.off()
 
-  nameNET <- paste0(output_folder,paste0(t,'-net-#{timestamp}.jpeg'))
-  treatment_out <- c(treatment_out, nameNET)
-  jpeg(nameNET)
-  y <- 250
-  mock_edges <- make_net(mock_long, y)
-  graphics.off()
+        # THIS IS A DIRTY LITTLE HACK
+        # mock_edges <- na.omit(mock_edges)
 
-  # THIS IS A DIRTY LITTLE HACK
-  # mock_edges <- na.omit(mock_edges)
+        library("jsonlite")
+        myjson <- toJSON(mock_edges)
+        nameJSON <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
+        treatment_out <- c(treatment_out, nameJSON)
+        cat(myjson, file=nameJSON)
 
-  library("jsonlite")
-  myjson <- toJSON(mock_edges)
-  nameJSON <- paste0(output_folder,paste0(t,'-json-#{timestamp}.json'))
-  treatment_out <- c(treatment_out, nameJSON)
-  cat(myjson, file=nameJSON)
+        myjson <- toJSON(mock_nodelabels)
+        nameNJSON <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
+        treatment_out <- c(treatment_out, nameNJSON)
+        cat(myjson, file=nameNJSON)
 
-  myjson <- toJSON(mock_nodelabels)
-  nameNJSON <- paste0(output_folder,paste0(t,'-json-names-#{timestamp}.njson'))
-  treatment_out <- c(treatment_out, nameNJSON)
-  cat(myjson, file=nameNJSON)
+        mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
 
+        # union_array <- c(union_array, mock_igr)
+        union_array[[length(union_array)+1]] <- mock_igr
 
-  mock_igr <- network.make.igraph(mock_edges, mock_nodelabels)
+        # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
+        # treatment_out <- c(treatment_out, name)
+        # jpeg(name)
+        # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
+        # graphics.off()
 
-  # union_array <- c(union_array, mock_igr)
-  union_array[[length(union_array)+1]] <- mock_igr
+        library("HiveR")
+        mock_hive <- make_annotated_hive(mock_igr)
+        library(plyr)
+        name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
+        treatment_out <- c(treatment_out, name)
+        jpeg(name)
+        plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
+        graphics.off()
 
-  # name <- paste0(output_folder,paste0(t,'-igr-#{timestamp}.jpeg'))
-  # treatment_out <- c(treatment_out, name)
-  # jpeg(name)
-  # plot(mock_igr, layout = layout.spring, edge.arrow.size = 0.5, vertex.size = 9, vertex.label.cex = 0.7, edge.color = "red")
-  # graphics.off()
+        # TABLE OUTPUT
+        # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
+        # treatment_out <- c(treatment_out, name)
+        # make_net
+        # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
 
-  library("HiveR")
-  mock_hive <- make_annotated_hive(mock_igr)
-  library(plyr)
-  name <- paste0(output_folder,paste0(t,'-hive-#{timestamp}.jpeg'))
-  treatment_out <- c(treatment_out, name)
-  jpeg(name)
-  plotHive(mock_hive, method = "abs", bkgnd = "black", axLabs = c("source", "hub", "sink"), axLab.pos = 1)
-  graphics.off()
-
-
-  # TABLE OUTPUT
-  # name <- paste0(output_folder,paste0(t,'-edges-#{timestamp}.txt'))
-  # treatment_out <- c(treatment_out, name)
-  # make_net
-  # write.table(get.edgelist(mock_igr), name, col.names = FALSE, row.names = FALSE)
-
-  output[[length(output)+1]] <- treatment_out
+        output[[length(output)+1]] <- treatment_out
 
 
-}
+      }
 
-# TEMP TURNED OFF
-# treatment_out <- c(treatment_out, 'combined')
-# union <- graph.union(union_array)
-# name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
-# treatment_out <- c(treatment_out, name)
-# jpeg(name)
-# plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
-# graphics.off()
+      # TEMP TURNED OFF
+      # treatment_out <- c(treatment_out, 'combined')
+      # union <- graph.union(union_array)
+      # name <- paste0(output_folder,paste0(t,'-union-#{timestamp}.jpeg'))
+      # treatment_out <- c(treatment_out, name)
+      # jpeg(name)
+      # plot(union, layout = layout.auto, edge.arrow.size = 0.5, vertex.size = 14, vertex.label.cex = 1.2, edge.color = "green")
+      # graphics.off()
 
-jsonOutput <- as.character(toJSON(output))
+      jsonOutput <- as.character(toJSON(output))
 
 EOF
 
@@ -249,19 +245,13 @@ EOF
   end
 
   def time_diff(start_time, end_time)
-
     seconds_diff = (start_time - end_time).to_i.abs
-
     hours = seconds_diff / 3600
     seconds_diff -= hours * 3600
-
     minutes = seconds_diff / 60
     seconds_diff -= minutes * 60
-
     seconds = seconds_diff
-
     puts "Time to completion: #{hours.to_s.rjust(2, '0')}:#{minutes.to_s.rjust(2, '0')}:#{seconds.to_s.rjust(2, '0')}"
-
   end
 
 end
