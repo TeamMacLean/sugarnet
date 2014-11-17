@@ -29,7 +29,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.musicPlaying = false;
     $scope.files = [];
     $scope.devMode = true;
-    $scope.musicOn = true;
+    $scope.musicOn = false;
     $scope.resultBlocks = [];
     $scope.ResultBlocksOriginal = [];
 
@@ -472,8 +472,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     }
 
                     thisBlock.nodes.sort(compare);
-                    thisBlock.topNodes = thisBlock.nodes.length;
-                    thisBlock.nodeCount = thisBlock.topNodes;
+                    thisBlock.topNodeCount = thisBlock.nodes.length;
+                    thisBlock.nodeCount = thisBlock.topNodeCount;
 
                     thisBlock.nodeColorByDegree = function () {
                         if (thisBlock.colorByDegreeToggle) {
@@ -688,10 +688,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
      * @param result
      */
     $scope.topNodes = function (result) {
-        var citrus = result.nodes.slice(0, result.topNodes);
+        var citrus = result.nodes.slice(0, result.topNodeCount);
+
         result.cy.load({
             nodes: citrus,
             edges: result.edges
+        }, function () {
+            result.cy.layout({ name: result.selectedLayout.value});
         });
     };
 
