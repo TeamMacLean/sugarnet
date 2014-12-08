@@ -3,4 +3,5 @@
 /public/graphs/*.*
 *.iml
 .idea
-public/components
+/public/components
+/public/tmp/tmp-*
