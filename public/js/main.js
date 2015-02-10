@@ -1,8 +1,11 @@
+var tour;
+
 /**
  *
  * @type {module|*}
  */
 var app = angular.module('rotool', []);
+
 
 // Just pretend this is not here, ok?
 
@@ -11,6 +14,7 @@ app.directive('fileInput', ['$parse', function ($parse) {
         restrict: 'A',
         link: function (scope, elm, attrs) {
             elm.bind('change', function () {
+                tour.next();
                 $parse(attrs.fileInput)
                     .assign(scope, elm[0].files);
                 scope.$apply();
@@ -28,30 +32,73 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     $scope.defineOptions = [];
     $scope.musicPlaying = false;
     $scope.files = [];
-    $scope.devMode = true;
+    $scope.devMode = false;
     $scope.musicOn = false;
     $scope.resultBlocks = [];
     $scope.ResultBlocksOriginal = [];
+    $scope.typedFirstTreatment = false;
+    $scope.addedFirstTreatment = false;
+
+    $scope.showGuide = true;
+
+
+    $scope.enableGuide = function () {
+        $scope.showGuide = 'true';
+        tour.show();
+        $('#guide-toggle').text('disable guide');
+        if ($scope.supports_html5_storage()) {
+            localStorage.setItem("showGuide", 'true');
+        }
+    };
+    $scope.disableGuide = function () {
+        $scope.showGuide = 'false';
+        tour.hide();
+        $('#guide-toggle').text('enable guide');
+        if ($scope.supports_html5_storage()) {
+            localStorage.setItem("showGuide", 'false');
+        }
+    };
+    $scope.toggleGuide = function () {
+        if ($scope.showGuide == 'true') {
+            $scope.disableGuide();
+        } else {
+            $scope.enableGuide();
+
+        }
+    };
+
+    $scope.supports_html5_storage = function () {
+        try {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
+        }
+    };
+
+    $scope.typingFirstTreatment = function () {
+        if (!$scope.typedFirstTreatment) {
+            tour.next();
+            $scope.typedFirstTreatment = true;
+        }
+    };
 
     $scope.reloadDefineOptions = function () {
         $scope.defineOptions = $scope.otherOptions.concat($scope.treatments);
     };
 
-    /**
-     *
-     * @param elm
-     */
     $scope.filesChanged = function (elm) {
         $scope.files = elm.files;
         $scope.$apply();
     };
 
-    /**
-     *
-     * @param header
-     */
     $scope.addTreatment = function (header) {
         if (!_.contains($scope.treatments, header) && !_.isEmpty(header)) {
+
+            if (!$scope.addedFirstTreatment) {
+                tour.next();
+                $scope.addedFirstTreatment = true;
+            }
+
             $scope.header = '';
 
             $scope.treatments.push(header);
@@ -59,10 +106,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         }
     };
 
-    /**
-     *
-     * @param treatment
-     */
     $scope.removeTreatment = function (treatment) {
         if (_.contains($scope.treatments, treatment)) {
             _.pull($scope.treatments, treatment);
@@ -99,6 +142,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                 headers: {'Content-Type': undefined}
             })
                 .success(function (d) {
+
                     $scope.headers = [];
                     _.forEach(d, function (item) {
                         var head = {name: item, treatment: undefined};
@@ -108,6 +152,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
                     $scope.fillOptions();
                     $('#dataExplainHelp').show();
                     toggleUploadLoading();
+                    tour.next();
                 })
                 .error(function () {
                     toggleUploadLoading();
@@ -154,59 +199,86 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         $('#results').show();
     };
 
-    $scope.getResults = function () {
-
-        /**
-         *
-         * @param headers
-         */
-        var postIt = function (headers) {
-
-            toggleResultsView();
-
-            var fd = new FormData();
-
-
-            if ($scope.files.length < 1) {
-                console.log('no files');
-                return;
+//    TODO this for time and repetitions too!
+    var headerEql = function (array, checker) {
+        console.log('checking headers', checker);
+        var headers = array;
+        if ($scope.devMode) {
+            console.log('DEV', headers);
+        }
+        var table = {};
+        headers.forEach(function (header) {
+            if (header[checker] && $scope.otherOptions.indexOf(header[checker]) == -1) {
+                if (table[header[checker]]) {
+                    table[header[checker]] += 1;
+                } else {
+                    table[header[checker]] = 1;
+                }
             }
-
-            //TODO limit to one file
-            // add file to form data
-            angular.forEach($scope.files, function (file) {
-                fd.append('file', file)
-            });
-
-            // add header list to form data
-            fd.append('headers', angular.toJson(headers));
-            fd.append('options', angular.toJson($scope.defineOptions));
-
-            // post it
-            $http.post('getResults', fd, {
-                transformRequest: angular.identity,
-                headers: {'Content-Type': undefined}
-            })
-                .success(function (d) {
-                    swal("Good job!", "It looks like it worked!", "success");
-                    $scope.processResults(d);
-                })
-                .error(function (err) {
-                    toggleResultsView();
-                    swal("Oops...", err, "error");
-                    console.log('error', err);
-                });
-        };
-        postIt($scope.headers);
+        });
+        console.log(table);
+        var first;
+        for (var value in table) {
+            if (!first) {
+                first = table[value];
+            }
+            if (table[value] !== first) {
+                swal("This will fail!", 'There are not an equal amount of data for each treatment', 'error');
+                return false;
+            }
+        }
+        return true;
     };
 
-    /**
-     *
-     * @param hex
-     * @param lum
-     * @returns {string}
-     * @constructor
-     */
+    var postIt = function () {
+        var headers = $scope.headers;
+        toggleResultsView();
+
+        var fd = new FormData();
+
+        if ($scope.files.length < 1) {
+            console.log('no files');
+            return;
+        }
+
+        //TODO limit to one file
+        // add file to form data
+        angular.forEach($scope.files, function (file) {
+            fd.append('file', file)
+        });
+
+        // add header list to form data
+        fd.append('headers', angular.toJson(headers));
+        fd.append('options', angular.toJson($scope.defineOptions));
+
+        // post it
+        $http.post('getResults', fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        })
+            .success(function (d) {
+                swal("Good job!", "It looks like it worked!", "success");
+                $scope.processResults(d);
+            })
+            .error(function (err) {
+                toggleResultsView();
+                swal("Oops...", err, "error");
+                console.log('error', err);
+            });
+
+    };
+
+    $scope.getResults = function () {
+        if (headerEql($scope.headers, 'treatment')
+            &&
+            headerEql($scope.headers, 'repetition')
+            &&
+            headerEql($scope.headers, 'time')) {
+            postIt();
+            tour.complete();
+        }
+    };
+
     var ColorLuminance = function (hex, lum) {
 
         // validate hex string
@@ -227,10 +299,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         return rgb;
     };
 
-    /**
-     *
-     * @returns {string}
-     */
     var makeid = function () {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -241,11 +309,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         return text;
     };
 
-    /**
-     *
-     * @param thisBlock
-     * @param cb
-     */
     var injectGraph = function (thisBlock, cb) {
 
         var json = thisBlock.json;
@@ -426,10 +489,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
             });
     };
 
-    /**
-     *
-     * @param result
-     */
     $scope.processResults = function (result) {
 
         //result should already be parsed json (angular does it by its self)
@@ -754,13 +813,29 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
      * @param result
      */
     $scope.cyToJSON = function (result) {
-        var out = {edges: result.edges, nodes: result.nodes};
-        var json = JSON.stringify(out);
-        var string = JSON.stringify(json, null, '\t');
-        var blob = new Blob([string], {type: "application/json"});
-        saveAs(blob, 'graph-' + result.id + '.json');
+
+
+        result.edges.forEach(function (edge) {
+
+//            FROM INTER TO
+//            "edge.data.source edge.data.pp edge.data.target"
+
+        });
+
+        console.log(result.cy.json());
+
+//        var out = result.edges;
+//        console.log(result);
+//        var string = JSON.stringify(out, null, '\t');
+//        var blob = new Blob([string], {type: "application/json"});
+//        saveAs(blob, 'graph-' + result.id + '.json');
     };
 
+
+    $scope.cyToSif = function (result) {
+
+
+    };
 
 //    this is just for fun
     var animateString = 'rubberBand';
@@ -775,7 +850,105 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
         player.toggleClass('fa-pause');
         player.toggleClass('fa-play');
         toggleMusic();
-    })
+    });
 
+
+//shepherd
+    $(document).ready(function () {
+
+        tour = new Shepherd.Tour({
+            defaults: {classes: 'shepherd-theme-arrows'},
+            scrollTo: true
+        });
+
+
+        tour.addStep('Select CSV', {
+            text: 'Select CSV file containing data',
+            attachTo: '#stepOne > div > div.form-inline > div > input right',
+            buttons: [
+                {
+                    text: 'hide guide!',
+                    action: $scope.disableGuide
+                }
+            ]
+        });
+        tour.addStep('Upload', {
+            text: 'Hit upload',
+            attachTo: '#stepOne > div > div.form-inline > div > button bottom',
+            buttons: [
+            ]
+        });
+        tour.addStep('Name Treatments', {
+            text: 'Name one of the treatments used in your results',
+            attachTo: '#stepTwo > div > form > input right',
+            buttons: [
+            ]
+        });
+        tour.addStep('Add it to the list', {
+            text: 'Add it to the list',
+            attachTo: '#stepTwo > div > form > button bottom',
+            buttons: [
+            ]
+        });
+
+        tour.addStep('Repeat for all treatments', {
+            text: 'Repeat this for all treatments',
+            attachTo: '#stepTwo > div bottom',
+            buttons: [
+                {
+                    text: 'next',
+                    action: tour.next
+                }
+            ]
+        });
+
+        tour.addStep('Set it colum (required)', {
+            text: 'Set ONE colum as the ID (required)',
+            attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
+            buttons: [
+                {
+                    text: 'next',
+                    action: tour.next
+                }
+            ]
+        });
+
+        tour.addStep('Fill out form', {
+            text: 'input repetition count and time data for each',
+            attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
+            buttons: [
+                {
+                    text: 'next',
+                    action: tour.next
+                }
+            ]
+        });
+
+
+        tour.addStep('Submit', {
+            text: 'Submit',
+            attachTo: '#stepThree > div > button.btn.btn-default bottom',
+            buttons: [
+
+            ]
+        });
+
+        if ($scope.supports_html5_storage()) {
+            $scope.showGuide = localStorage.getItem("showGuide");
+            console.log('at start', $scope.showGuide);
+
+            tour.start();
+
+            if ($scope.showGuide == 'false') {
+                $('#guide-toggle').text('enable guide');
+                tour.hide();
+            } else {
+                $('#guide-toggle').text('disable guide');
+            }
+        }
+    })
 }]);
+
+
+
 

@@ -294,3 +294,11 @@ hr {
         -webkit-transform: scaleY(1.0);
     }
 }
+
+#guide-toggle {
+    text-decoration: none;
+    color: black;
+    position: absolute;
+    right:35px;
+    top:35px;
+}

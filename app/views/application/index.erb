@@ -1,5 +1,7 @@
 <div ng-app="rotool" ng-controller="checkController" id="checkController">
 
+        <a href="#" class="btn btn-default" id="guide-toggle" ng-click="toggleGuide()">toggle guide</a>
+
     <div id="stepOne">
 
         <div class="container">
@@ -31,7 +33,7 @@
             <h1 class="alignLeft">2. Add treatments</h1>
 
             <form ng-submit="addTreatment(header)" class="form-inline">
-                <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name">
+                <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name" ng-change="typingFirstTreatment()">
                 <button class="btn btn-default">add Treatment</button>
             </form>
 
@@ -97,7 +99,7 @@
                 </div>
             </div>
 
-            <!--<button class="btn btn-danger" ng-show="devMode" ng-click="devFill()">DEV CHEAT</button>-->
+            <button class="btn btn-danger" ng-show="devMode" ng-click="devFill()">DEV CHEAT</button>
             <button class="btn btn-default disabled" ng-click="getResults()">Submit</button>
         </div>
     </div>
