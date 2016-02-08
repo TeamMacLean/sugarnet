@@ -901,10 +901,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: 'Repeat this for all samples/treatments',
       attachTo: '#stepTwo > div bottom',
       buttons: [
-        {
-          text: 'next',
-          action: tour.next
-        }
+        //{
+        //  text: 'next',
+        //  action: tour.next
+        //}
       ]
     });
 
@@ -912,10 +912,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: 'Set ONE colum as the ID (required)',
       attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
       buttons: [
-        {
-          text: 'next',
-          action: tour.next
-        }
+        //{
+        //  text: 'next',
+        //  action: tour.next
+        //}
       ]
     });
 
@@ -923,10 +923,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: ['Now tell PiNet which columns are which.', 'Click the "Sample/Treatment" dropdown and pick the category for each column name.', 'You should add gene/probe/tag names as "ID". Select "Unused" if that colum should be ignored.', 'Next add the replicate number for each column.', 'Finally add the time point information for each sample/treatment'],
       attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
       buttons: [
-        {
-          text: 'next',
-          action: tour.next
-        }
+        //{
+        //  text: 'next',
+        //  action: tour.next
+        //}
       ]
     });
 
