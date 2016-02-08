@@ -886,8 +886,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: 'This should be your gene experssion data',
       attachTo: '#stepOne > div > div.form-inline > div > input right',
       buttons: [
-        nextButton,
-        previousButton
+        nextButton
       ]
     });
     tour.addStep('Upload', {
@@ -947,7 +946,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: 'Submit',
       attachTo: '#stepThree > div > button.btn.btn-default bottom',
       buttons: [
-        nextButton,
         previousButton
       ]
     });
