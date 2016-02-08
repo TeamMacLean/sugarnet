@@ -299,11 +299,11 @@ hr {
     text-decoration: none;
     color: black;
     position: absolute;
-    right:35px;
-    top:35px;
+    right: 35px;
+    top: 35px;
 }
 
 .shepherd-element.shepherd-theme-arrows .shepherd-content {
-    width: 400px;
-    max-width: 100%;
+    /*width: 400px;*/
+    max-width: 400px;
 }
