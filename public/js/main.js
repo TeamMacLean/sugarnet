@@ -164,9 +164,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     //TODO disable ID + unused inputs
     _.forEach($scope.headers, function (header) {
-
-      console.log('checking headers');
-
+      console.log('checking headers', header);
     });
 
     if (!_.isEmpty($scope.files)) {
@@ -872,13 +870,13 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     tour.addStep('CSV File', {
       text: 'This should be your gene experssion data',
-      attachTo: '#stepOne > div > div.form-inline > div > input right',
-      buttons: [
-        {
-          text: 'hide guide!',
-          action: $scope.disableGuide
-        }
-      ]
+      attachTo: '#stepOne > div > div.form-inline > div > input right'
+      //buttons: [
+      //  {
+      //    text: 'hide guide!',
+      //    action: $scope.disableGuide
+      //  }
+      //]
     });
     tour.addStep('Upload', {
       text: 'Hit upload',
@@ -936,19 +934,19 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       buttons: []
     });
 
-    if ($scope.supports_html5_storage()) {
-      $scope.showGuide = localStorage.getItem("showGuide");
-      console.log('at start', $scope.showGuide);
-
-      tour.start();
-
-      if ($scope.showGuide == 'false') {
-        $('#guide-toggle').text('enable guide');
-        tour.hide();
-      } else {
-        $('#guide-toggle').text('disable guide');
-      }
-    }
+    //if ($scope.supports_html5_storage()) {
+    //  $scope.showGuide = localStorage.getItem("showGuide");
+    //  console.log('at start', $scope.showGuide);
+    //
+    //  tour.start();
+    //
+    //  if ($scope.showGuide == 'false') {
+    //    $('#guide-toggle').text('enable guide');
+    //    tour.hide();
+    //  } else {
+    //    $('#guide-toggle').text('disable guide');
+    //  }
+    //}
   })
 }]);
 
