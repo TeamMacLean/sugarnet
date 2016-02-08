@@ -886,7 +886,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       buttons: []
     });
     tour.addStep('Name Treatments', {
-      text: 'You should now categorise and group your expression data. Type your first sample/treatment catefory name into the box and click add. You do not need to add to add time point information.',
+      text: 'You should now categorise and group your expression data. \nType your first sample/treatment catefory name into the box and click add. \nYou do not need to add to add time point information.',
       attachTo: '#stepTwo > div > form > input right',
       buttons: []
     });
@@ -919,7 +919,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     });
 
     tour.addStep('Fill out form', {
-      text: 'Now tell PiNet which columns are which. Click the "Treatment/Sample" dropdown and pick the category for each column name. You should add gene/probe/tag names as "ID". Select "Unused" if that colum should be ignored. Next add the replicate number for each column. Finally add the time point infomation for eact treatment/sample',
+      text: 'Now tell PiNet which columns are which. \nClick the "Treatment/Sample" dropdown and pick the category for each column name. \nYou should add gene/probe/tag names as "ID". Select "Unused" if that colum should be ignored. \n\nNext add the replicate number for each column. \n\nFinally add the time point infomation for eact treatment/sample',
       attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
       buttons: [
         {
