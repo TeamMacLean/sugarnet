@@ -307,3 +307,7 @@ hr {
     /*width: 400px;*/
     max-width: 400px;
 }
+
+.white-text {
+    color: white;
+}
