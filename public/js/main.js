@@ -164,12 +164,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     //TODO disable ID + unused inputs
     _.forEach($scope.headers, function (header) {
-
-      if (header.treatment == 'UNUSED' || header.treatment == 'ID') {
-        header.disableInputs = true;
-      }
-
-      console.log('checking headers', header);
+      console.log(header.treatment, header.treatment == 'UNUSED' || header.treatment == 'ID');
+      header.disableInputs = !!(header.treatment == 'UNUSED' || header.treatment == 'ID');
+      //console.log('checking headers', header);
 
     });
 
