@@ -81,17 +81,17 @@
             <select class="center-block form-control" ng-model="header.treatment" ng-options="d as d for d in defineOptions" ng-change="checkCompletion()" tabindex="1"></select>
           </div>
           <div class="col-xs-2">
-            <input class="center-block form-control" ng-model="header.repetition" type="number" tabindex="2">
+            <input class="center-block form-control" ng-model="header.repetition" ng-disabled="header.disableInputs" type="number" tabindex="2">
           </div>
           <div class="col-xs-6">
             <div class="col-xs-4">
-              <input class="center-block form-control" ng-model="header.time.days" type="number" tabindex="3">
+              <input class="center-block form-control" ng-model="header.time.days" ng-disabled="header.disableInputs" type="number" tabindex="3">
             </div>
             <div class="col-xs-4">
-              <input class="center-block form-control" ng-model="header.time.hours" type="number" tabindex="4">
+              <input class="center-block form-control" ng-model="header.time.hours" ng-disabled="header.disableInputs" type="number" tabindex="4">
             </div>
             <div class="col-xs-4">
-              <input class="center-block form-control" ng-model="header.time.minutes" type="number" tabindex="5">
+              <input class="center-block form-control" ng-model="header.time.minutes" ng-disabled="header.disableInputs" type="number" tabindex="5">
             </div>
           </div>
         </div>
