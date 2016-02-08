@@ -5,6 +5,7 @@
     <div class="container">
 
       <h1 class="alignLeft">1. Upload your CSV file</h1>
+      <span>The first row should be a header and contain the column names. The column names will be parsed and presented for grouping in the next step. You can see an example <a href="/faq">here</a>.</span>
 
       <div class="form-inline">
         <div class="form-group">
@@ -29,6 +30,7 @@
   <div id="stepTwo">
     <div class="container">
       <h1 class="alignLeft">2. Add treatments</h1>
+      <span>Here you will create the categories of treatments or/samples that you used in the experiment. Just the categories, don't worry about adding the time point info yet.</span>
 
       <form ng-submit="addTreatment(header)" class="form-inline">
         <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name" ng-change="typingFirstTreatment()">
@@ -48,6 +50,7 @@
   <div id="stepThree">
     <div class="container">
       <h1 class="alignLeft">3. Explain the data</h1>
+      <span>If you dont want particular samples to be analysed but don't want to delete them from the file you have the option to mark them as `UNUSED`</span>
 
       <div class="row" id="dataExplainHelp">
         <div class="col-xs-2">
