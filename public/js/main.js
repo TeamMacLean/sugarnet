@@ -884,7 +884,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     tour.addStep('CSV File', {
       text: 'This should be your gene experssion data',
-      attachTo: '#stepOne > div > div.form-inline > div > input right',
+      attachTo: '#stepOne > div > div.form-inline > div > input bottom',
       buttons: [
         nextButton
       ]
@@ -899,7 +899,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     });
     tour.addStep('Name Treatments', {
       text: ['You should now categorise and group your expression data.', 'Type your first sample/treatment category name into the box and click add.', 'You do not need to add to add time point information.', 'Repeat for all samples/treatments'],
-      attachTo: '#stepTwo > div > form > input right',
+      attachTo: '#stepTwo > div > form > input bottom',
       buttons: [
         previousButton,
         nextButton
