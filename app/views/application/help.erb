@@ -1,5 +1,31 @@
 <div class="container">
+  
+  <h2 id="faq">Frequently asked questions</h2>
 
-    <h2>Help</h2>
+  <h3> What should my data file look like?</h3>
+
+  <p>You will need to prepare a file of gene expression values from some experiment such as an RNA-Seq or microarray.
+    The
+    file should have at least one column of unique IDs for genes/probes and multiple columns for data. The first row
+    should have headers denoting the contents of the column, the headers don't have to follow any particular convention.
+    E.G ![This sample image](sample.tiff)</p>
+  <p>The column `gene_id` contains unique IDs, `tracking_id` is a second alternative naming scheme and the rest are data
+    columns. The header indicates a unique treatment/sample name for the column.</p>
+
+  <p>The file must be saved as a `.csv` (comma separated value) file, which you can create in Excel. This means you
+    mustn't
+    use commas in your data file, anywhere!</p>
+
+  <h3> Can I name my headers anything?</h3>
+
+  <p>Yes. But don't use commas. Also try just to use numbers, letters of the alphabet and the underscore (`_`) character
+    in
+    names, to make it as readable by any program as possible.</p>
+
+  <h3> Are missing data allowed?</h3>
+
+  <p>You can specify a missing data point in a column by using `NA` in the cell in place of the number.</p>
+
+  <p>You can also tell PINet to ignore columns of data in the interface by selecting the column as `UNUSED`.</p>
 
 </div>
