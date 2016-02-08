@@ -1,196 +1,196 @@
 <div ng-app="rotool" ng-controller="checkController" id="checkController">
 
-        <a href="#" class="btn btn-default" id="guide-toggle" ng-click="toggleGuide()">toggle guide</a>
+  <a href="#" class="btn btn-default" id="guide-toggle" ng-click="toggleGuide()">toggle guide</a>
 
-    <div id="stepOne">
+  <div id="stepOne">
 
-        <div class="container">
+    <div class="container">
 
-            <h1 class="alignLeft">1. Upload your CSV file</h1>
+      <h1 class="alignLeft">1. Upload your CSV file</h1>
 
-            <div class="form-inline">
-                <div class="form-group">
-                    <input type="file" file-input="files" class="center-block form-control">
-                    <button ng-click="upload()" class="btn btn-default">Upload</button>
-                </div>
-            </div>
-
-            <div id="upload-spinner" class="spinner">
-                <h2>Processing...</h2>
-
-                <div class="rect1"></div>
-                <div class="rect2"></div>
-                <div class="rect3"></div>
-                <div class="rect4"></div>
-                <div class="rect5"></div>
-            </div>
-
+      <div class="form-inline">
+        <div class="form-group">
+          <input type="file" file-input="files" class="center-block form-control">
+          <button ng-click="upload()" class="btn btn-default">Upload</button>
         </div>
+      </div>
+
+      <div id="upload-spinner" class="spinner">
+        <h2>Processing...</h2>
+
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+      </div>
+
     </div>
+  </div>
 
-    <div id="stepTwo">
-        <div class="container">
-            <h1 class="alignLeft">2. Add treatments</h1>
+  <div id="stepTwo">
+    <div class="container">
+      <h1 class="alignLeft">2. Add treatments</h1>
 
-            <form ng-submit="addTreatment(header)" class="form-inline">
-                <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name" ng-change="typingFirstTreatment()">
-                <button class="btn btn-default">add Treatment</button>
-            </form>
+      <form ng-submit="addTreatment(header)" class="form-inline">
+        <input type="text" ng-model="header" class="center-block form-control" placeholder="treatment name" ng-change="typingFirstTreatment()">
+        <button class="btn btn-default">add Treatment</button>
+      </form>
 
-            <div ng-repeat="treatment in treatments">
-                <div class="non-btn float-left">
-                    <button type="button" ng-click="removeTreatment(treatment)" class="close">
-                        <span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                    {{treatment}}
-                </div>
-            </div>
+      <div ng-repeat="treatment in treatments">
+        <div class="non-btn float-left">
+          <button type="button" ng-click="removeTreatment(treatment)" class="close">
+            <span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+          {{treatment}}
         </div>
+      </div>
     </div>
+  </div>
 
-    <div id="stepThree">
-        <div class="container">
-            <h1 class="alignLeft">3. Explain the data</h1>
+  <div id="stepThree">
+    <div class="container">
+      <h1 class="alignLeft">3. Explain the data</h1>
 
-            <div class="row" id="dataExplainHelp">
-                <div class="col-xs-2">
-                    <h4>Column name</h4>
-                </div>
-                <div class="col-xs-2">
-                    <h4>Treatments</h4>
-                </div>
-                <div class="col-xs-2">
-                    <h4>Repetition</h4>
-                </div>
-                <div class="col-xs-6">
-                    <div class="col-xs-4">
-                        <h4>Days</h4>
-                    </div>
-                    <div class="col-xs-4">
-                        <h4>Hours</h4>
-                    </div>
-                    <div class="col-xs-4">
-                        <h4>Minutes</h4>
-                    </div>
-                </div>
-            </div>
-
-            <div ng-repeat="header in headers" id="headerList">
-                <div class="row">
-                    <div class="col-xs-2">
-                        <h4>{{header.name}}</h4>
-                    </div>
-                    <div class="col-xs-2">
-                        <select class="center-block form-control" ng-model="header.treatment" ng-options="d as d for d in defineOptions" ng-change="checkCompletion()" tabindex="1"></select>
-                    </div>
-                    <div class="col-xs-2">
-                        <input class="center-block form-control" ng-model="header.repetition" type="number" tabindex="2">
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="col-xs-4">
-                            <input class="center-block form-control" ng-model="header.time.days" type="number" tabindex="3">
-                        </div>
-                        <div class="col-xs-4">
-                            <input class="center-block form-control" ng-model="header.time.hours" type="number" tabindex="4">
-                        </div>
-                        <div class="col-xs-4">
-                            <input class="center-block form-control" ng-model="header.time.minutes" type="number" tabindex="5">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn btn-danger" ng-show="devMode" ng-click="devFill()">DEV CHEAT</button>
-            <button class="btn btn-default disabled" ng-click="getResults()">Submit</button>
+      <div class="row" id="dataExplainHelp">
+        <div class="col-xs-2">
+          <h4>Column name</h4>
         </div>
-    </div>
-
-    <div id="results" class="container">
-        <div id="result-spinner" class="spinner">
-            <h2>Processing...</h2>
-
-            <div class="rect1"></div>
-            <div class="rect2"></div>
-            <div class="rect3"></div>
-            <div class="rect4"></div>
-            <div class="rect5"></div>
+        <div class="col-xs-2">
+          <h4>Sample/Treatments</h4>
         </div>
-        <audio controls id="music">
-            <source src="/music/theGirl.mp3" type="audio/mpeg">
-        </audio>
-        <i id="musicPlayer" class="fa fa-pause fa-4x"></i>
-    </div>
-
-
-    <div ng-repeat="result in resultBlocks" class="container">
-        <h2 class="treatmentTitle">{{result.treatment}}</h2>
-
-        <div class="row cyWrapper mb">
-            <div class="col-sm-3">
-
-                <div class="form-group">
-                    <label for="layout{{result.id}}">Layout</label>
-                    <select ng-model="result.selectedLayout" id="layout{{result.id}}" ng-options="layout as layout.key for layout in result.layoutOptions" ng-change="changeLayout(result)">
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="edgeColor{{result.id}}">Edge colour</label>
-                    <select ng-model="result.selectedEdgeColor" id="edgeColor{{result.id}}" ng-options="edgeColor as edgeColor.key for edgeColor in result.edgeColors" ng-change="changeEdgeColor(result)">
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="nodeColor{{result.id}}">Node colour</label>
-                    <select ng-model="result.selectedNodeColor" id="nodeColor{{result.id}}" ng-options="nodeColor as nodeColor.key for nodeColor in result.nodeColors" ng-change="changeNodeColor(result)">
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="topNodes{{result.id}}">Show top X nodes by degree</label>
-                    <input ng-model="result.topNodeCount" id="topNodes{{result.id}}" class="form-control" type="number" ng-change="topNodes(result)" min="0" max="{{result.nodeCount}}">
-                </div>
-
-                <div class="form-group">
-                    <label for="edgesToShow{{result.id}}">DO NOT USE</label>
-                    <input ng-model="result.edgesToShow" id="edgesToShow{{result.id}}" class="form-control" type="number" ng-change="edgesToShow(result)" min="0">
-                </div>
-
-
-                <label class="blockme">
-                    Node size by degree
-                    <input type="checkbox" ng-model="result.sizeByDegreeToggle" ng-change="sizeByDegree(result)">
-                </label>
-
-                <label class="blockme">
-                    Node colour by degree
-                    <input type="checkbox" ng-model="result.colorByDegreeToggle" ng-change="colorByDegree(result)">
-                </label>
-
-                <label class="blockme">
-                    Node edge count
-                    <input type="checkbox" ng-model="result.showEdgeCount" ng-change="toggleEdgeCount(result)">
-                </label>
-
-                <button class="btn btn-default" ng-click="cyToPng(result)">Export PNG</button>
-                <button class="btn btn-default" ng-click="cyToJSON(result)">Export JSON</button>
-
-            </div>
-
-            <div class="col-sm-9 cy" id="{{result.id}}">
-                <!--CYTOSCAPE-->
-            </div>
+        <div class="col-xs-2">
+          <h4>Repetition</h4>
         </div>
+        <div class="col-xs-6">
+          <div class="col-xs-4">
+            <h4>Days</h4>
+          </div>
+          <div class="col-xs-4">
+            <h4>Hours</h4>
+          </div>
+          <div class="col-xs-4">
+            <h4>Minutes</h4>
+          </div>
+        </div>
+      </div>
+
+      <div ng-repeat="header in headers" id="headerList">
         <div class="row">
-            <div class="col-sm-6 mb">
-                <img ng-src="{{result.net}}" class="img-responsive"/>
+          <div class="col-xs-2">
+            <h4>{{header.name}}</h4>
+          </div>
+          <div class="col-xs-2">
+            <select class="center-block form-control" ng-model="header.treatment" ng-options="d as d for d in defineOptions" ng-change="checkCompletion()" tabindex="1"></select>
+          </div>
+          <div class="col-xs-2">
+            <input class="center-block form-control" ng-model="header.repetition" type="number" tabindex="2">
+          </div>
+          <div class="col-xs-6">
+            <div class="col-xs-4">
+              <input class="center-block form-control" ng-model="header.time.days" type="number" tabindex="3">
             </div>
-            <div class="col-sm-6 mb">
-                <img ng-src="{{result.hive}}" class="img-responsive"/>
+            <div class="col-xs-4">
+              <input class="center-block form-control" ng-model="header.time.hours" type="number" tabindex="4">
             </div>
+            <div class="col-xs-4">
+              <input class="center-block form-control" ng-model="header.time.minutes" type="number" tabindex="5">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-danger" ng-show="devMode" ng-click="devFill()">DEV CHEAT</button>
+      <button class="btn btn-default disabled" ng-click="getResults()">Submit</button>
+    </div>
+  </div>
+
+  <div id="results" class="container">
+    <div id="result-spinner" class="spinner">
+      <h2>Processing...</h2>
+
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+    <audio controls id="music">
+      <source src="/music/theGirl.mp3" type="audio/mpeg">
+    </audio>
+    <i id="musicPlayer" class="fa fa-pause fa-4x"></i>
+  </div>
+
+
+  <div ng-repeat="result in resultBlocks" class="container">
+    <h2 class="treatmentTitle">{{result.treatment}}</h2>
+
+    <div class="row cyWrapper mb">
+      <div class="col-sm-3">
+
+        <div class="form-group">
+          <label for="layout{{result.id}}">Layout</label>
+          <select ng-model="result.selectedLayout" id="layout{{result.id}}" ng-options="layout as layout.key for layout in result.layoutOptions" ng-change="changeLayout(result)">
+          </select>
         </div>
 
-        <hr>
+        <div class="form-group">
+          <label for="edgeColor{{result.id}}">Edge colour</label>
+          <select ng-model="result.selectedEdgeColor" id="edgeColor{{result.id}}" ng-options="edgeColor as edgeColor.key for edgeColor in result.edgeColors" ng-change="changeEdgeColor(result)">
+          </select>
+        </div>
 
+        <div class="form-group">
+          <label for="nodeColor{{result.id}}">Node colour</label>
+          <select ng-model="result.selectedNodeColor" id="nodeColor{{result.id}}" ng-options="nodeColor as nodeColor.key for nodeColor in result.nodeColors" ng-change="changeNodeColor(result)">
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="topNodes{{result.id}}">Show top X nodes by degree</label>
+          <input ng-model="result.topNodeCount" id="topNodes{{result.id}}" class="form-control" type="number" ng-change="topNodes(result)" min="0" max="{{result.nodeCount}}">
+        </div>
+
+        <div class="form-group">
+          <label for="edgesToShow{{result.id}}">DO NOT USE</label>
+          <input ng-model="result.edgesToShow" id="edgesToShow{{result.id}}" class="form-control" type="number" ng-change="edgesToShow(result)" min="0">
+        </div>
+
+
+        <label class="blockme">
+          Node size by degree
+          <input type="checkbox" ng-model="result.sizeByDegreeToggle" ng-change="sizeByDegree(result)">
+        </label>
+
+        <label class="blockme">
+          Node colour by degree
+          <input type="checkbox" ng-model="result.colorByDegreeToggle" ng-change="colorByDegree(result)">
+        </label>
+
+        <label class="blockme">
+          Node edge count
+          <input type="checkbox" ng-model="result.showEdgeCount" ng-change="toggleEdgeCount(result)">
+        </label>
+
+        <button class="btn btn-default" ng-click="cyToPng(result)">Export PNG</button>
+        <button class="btn btn-default" ng-click="cyToJSON(result)">Export JSON</button>
+
+      </div>
+
+      <div class="col-sm-9 cy" id="{{result.id}}">
+        <!--CYTOSCAPE-->
+      </div>
     </div>
+    <div class="row">
+      <div class="col-sm-6 mb">
+        <img ng-src="{{result.net}}" class="img-responsive"/>
+      </div>
+      <div class="col-sm-6 mb">
+        <img ng-src="{{result.hive}}" class="img-responsive"/>
+      </div>
+    </div>
+
+    <hr>
+
+  </div>
 
 </div>
