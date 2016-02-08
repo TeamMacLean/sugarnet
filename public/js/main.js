@@ -164,7 +164,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
     //TODO disable ID + unused inputs
     _.forEach($scope.headers, function (header) {
-      console.log('checking headers', header);
+
+      console.log('checking headers');
+
     });
 
     if (!_.isEmpty($scope.files)) {
@@ -937,15 +939,15 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     //if ($scope.supports_html5_storage()) {
     //  $scope.showGuide = localStorage.getItem("showGuide");
     //  console.log('at start', $scope.showGuide);
-    //
-    //  tour.start();
-    //
-    //  if ($scope.showGuide == 'false') {
-    //    $('#guide-toggle').text('enable guide');
-    //    tour.hide();
-    //  } else {
-    //    $('#guide-toggle').text('disable guide');
-    //  }
+
+    tour.start();
+
+    //if ($scope.showGuide == 'false') {
+    //  $('#guide-toggle').text('enable guide');
+    //  tour.hide();
+    //} else {
+    //  $('#guide-toggle').text('disable guide');
+    //}
     //}
   })
 }]);
