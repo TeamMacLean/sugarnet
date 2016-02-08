@@ -302,3 +302,8 @@ hr {
     right:35px;
     top:35px;
 }
+
+.shepherd-element.shepherd-theme-arrows .shepherd-content {
+    width: 400px;
+    max-width: 100%;
+}
