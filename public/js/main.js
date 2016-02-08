@@ -871,40 +871,56 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     });
 
 
+    var nextButton = {
+      text: 'next',
+      action: tour.next
+    };
+
+    var previousButton = {
+      text: 'back',
+      action: tour.back
+    }
+
+
     tour.addStep('CSV File', {
       text: 'This should be your gene experssion data',
       attachTo: '#stepOne > div > div.form-inline > div > input right'
-      //buttons: [
-      //  {
-      //    text: 'hide guide!',
-      //    action: $scope.disableGuide
-      //  }
-      //]
+      buttons: [
+        nextButton,
+        previousButton
+      ]
     });
     tour.addStep('Upload', {
       text: 'Hit upload',
       attachTo: '#stepOne > div > div.form-inline > div > button bottom',
-      buttons: []
+      buttons: [
+        nextButton,
+        previousButton
+      ]
     });
     tour.addStep('Name Treatments', {
       text: ['You should now categorise and group your expression data.', 'Type your first sample/treatment category name into the box and click add.', 'You do not need to add to add time point information.', 'Repeat for all samples/treatments'],
       attachTo: '#stepTwo > div > form > input right',
-      buttons: []
+      buttons: [
+        nextButton,
+        previousButton
+      ]
     });
     tour.addStep('Add it to the list', {
       text: 'Add it to the list',
       attachTo: '#stepTwo > div > form > button bottom',
-      buttons: []
+      buttons: [
+        nextButton,
+        previousButton
+      ]
     });
 
     tour.addStep('Repeat for all treatments', {
       text: 'Repeat this for all samples/treatments',
       attachTo: '#stepTwo > div bottom',
       buttons: [
-        //{
-        //  text: 'next',
-        //  action: tour.next
-        //}
+        nextButton,
+        previousButton
       ]
     });
 
@@ -912,10 +928,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: 'Set ONE colum as the ID (required)',
       attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
       buttons: [
-        //{
-        //  text: 'next',
-        //  action: tour.next
-        //}
+        nextButton,
+        previousButton
       ]
     });
 
@@ -923,10 +937,8 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
       text: ['Now tell PiNet which columns are which.', 'Click the "Sample/Treatment" dropdown and pick the category for each column name.', 'You should add gene/probe/tag names as "ID". Select "Unused" if that colum should be ignored.', 'Next add the replicate number for each column.', 'Finally add the time point information for each sample/treatment'],
       attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
       buttons: [
-        //{
-        //  text: 'next',
-        //  action: tour.next
-        //}
+        nextButton,
+        previousButton
       ]
     });
 
@@ -934,7 +946,10 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     tour.addStep('Submit', {
       text: 'Submit',
       attachTo: '#stepThree > div > button.btn.btn-default bottom',
-      buttons: []
+      buttons: [
+        nextButton,
+        previousButton
+      ]
     });
 
     //if ($scope.supports_html5_storage()) {
