@@ -879,12 +879,12 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     var previousButton = {
       text: 'back',
       action: tour.back
-    }
+    };
 
 
     tour.addStep('CSV File', {
       text: 'This should be your gene experssion data',
-      attachTo: '#stepOne > div > div.form-inline > div > input right'
+      attachTo: '#stepOne > div > div.form-inline > div > input right',
       buttons: [
         nextButton,
         previousButton
