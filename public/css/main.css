@@ -316,3 +316,7 @@ hr {
     display: block;
     text-align: center;
 }
+
+.pi-nav a {
+    padding: 0 8px;
+}
