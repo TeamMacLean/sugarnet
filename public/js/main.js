@@ -572,6 +572,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
 //TODO get rid of this ASAP
 
+
   $scope.devFill = function () {
     $scope.treatments = ['MOCK', 'AVR', 'VIR'];
     $scope.reloadDefineOptions();
@@ -711,7 +712,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     ];
     $scope.checkCompletion();
   };
-
+  window.devFill = $scope.devFill;
   /**
    *
    * @param result
