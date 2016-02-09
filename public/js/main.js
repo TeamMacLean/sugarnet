@@ -712,7 +712,6 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     ];
     $scope.checkCompletion();
   };
-  window.devFill = $scope.devFill;
   /**
    *
    * @param result
