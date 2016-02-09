@@ -311,3 +311,8 @@ hr {
 .white-text {
     color: white;
 }
+
+.pi-nav {
+    display: block;
+    text-align: center;
+}
