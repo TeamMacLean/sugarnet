@@ -883,7 +883,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
 
 
     tour.addStep('CSV File', {
-      text: 'This should be your gene experssion data',
+      text: 'This should be your gene expression data',
       attachTo: '#stepOne > div > div.form-inline > div > input bottom',
       buttons: [
         nextButton
@@ -933,7 +933,7 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     });
 
     tour.addStep('Fill out form', {
-      text: ['Now tell PiNet which columns are which.', 'Click the "Sample/Treatment" dropdown and pick the category for each column name.', 'You should add gene/probe/tag names as "ID". Select "Unused" if that colum should be ignored.', 'Next add the replicate number for each column.', 'Finally add the time point information for each sample/treatment'],
+      text: ['Now tell PiNet which columns are which.', 'Click the "Sample/Treatment" drop-down and pick the category for each column name.', 'You should add gene/probe/tag names as "ID". Select "Unused" if that colum should be ignored.', 'Next add the replicate number for each column.', 'Finally add the time point information for each sample/treatment'],
       attachTo: ' #dataExplainHelp > div:nth-child(2) > h4 top',
       buttons: [
         previousButton,
