@@ -261,6 +261,9 @@ app.controller('checkController', ['$scope', '$http', function ($scope, $http) {
     fd.append('options', angular.toJson($scope.defineOptions));
 
     // post it
+
+    console.log('headers sent:', $scope.headers)
+
     $http.post('getResults', fd, {
         transformRequest: angular.identity,
         headers: {'Content-Type': undefined}
